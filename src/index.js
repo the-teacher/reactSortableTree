@@ -1,8 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-console.log('Hello from sortableTree')
-console.log(document.getElementById('appRoot'))
+import { getById, log } from './shared/helpers'
+
+log('Hello from sortableTree')
+log(getById('appRoot'))
 
 import App from './app'
-ReactDOM.render(<App />, document.getElementById('appRoot'))
+ReactDOM.render(<App />, getById('appRoot'))
