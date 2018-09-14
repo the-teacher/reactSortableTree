@@ -22,7 +22,7 @@ const webpackConfig = {
   module: {
     rules: [
       {
-        test: /js$/,
+        test: /jsx?$/,
         use: Loaders.BABEL,
         exclude: /node_modules/
       },
