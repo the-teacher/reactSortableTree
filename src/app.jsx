@@ -2,7 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import { log } from './shared/helpers'
-
 import SortableTree from './sortableTree'
 
 class App extends React.Component {
@@ -30,11 +29,9 @@ class App extends React.Component {
   render() {
     return <div>
       <h1>{this.state.helloText} {this.state.amount}</h1>
-
-      <SortableTree nodesAmount={this.state.amount} />
-
       <button onClick={this.onClickAddNode}>Add Node</button>
       <button onClick={this.onClickRemoveNode}>Remove Node</button>
+      <SortableTree nodesAmount={this.state.amount} />
     </div>;
   }
 }

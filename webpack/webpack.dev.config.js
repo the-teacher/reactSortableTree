@@ -16,7 +16,7 @@ const webpackConfig = {
   },
 
   resolve: {
-    extensions: ['.js', '.jsx', '.css']
+    extensions: ['.js', '.jsx', '.css', '.sass']
   },
 
   module: {
@@ -29,6 +29,11 @@ const webpackConfig = {
       {
         test: /css$/,
         use: Loaders.CSS,
+        exclude: /node_modules/
+      },
+      {
+        test: /sass$/,
+        use: Loaders.SASS,
         exclude: /node_modules/
       }
     ]
