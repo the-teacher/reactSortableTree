@@ -8,7 +8,8 @@ const webpackConfig = {
   mode: NODE_ENV,
 
   entry: {
-    example_1: `${rootPath}/src/example_1/index.js`
+    example_1: `${rootPath}/src/example_1/index.js`,
+    example_3: `${rootPath}/src/example_3/index.js`
   },
 
   output: {
