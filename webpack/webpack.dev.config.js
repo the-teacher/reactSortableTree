@@ -7,10 +7,12 @@ const NODE_ENV = process.env.NODE_ENV || 'development'
 const webpackConfig = {
   mode: NODE_ENV,
 
-  entry: `${rootPath}/src/index.js`,
+  entry: {
+    example_1: `${rootPath}/src/example_1/index.js`
+  },
 
   output: {
-    filename: 'sortableTree.js',
+    filename: '[name]/[name].js',
     path: `${rootPath}/build/`,
     publicPath: './'
   },

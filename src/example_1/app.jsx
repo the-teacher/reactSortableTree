@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import { log } from './shared/helpers'
+import { log } from '../shared/helpers'
 import SortableTree from './sortableTree'
 
 class App extends React.Component {
