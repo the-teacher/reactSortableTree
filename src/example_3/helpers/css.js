@@ -1,4 +1,4 @@
-import { doc } from './helpers'
+import { doc } from './base'
 
 function _toggleClass(el, name, state) {
   if (el) {

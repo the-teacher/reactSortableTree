@@ -1,4 +1,4 @@
-import { doc } from './helpers'
+import { doc } from './base'
 
 const captureMode = false
 

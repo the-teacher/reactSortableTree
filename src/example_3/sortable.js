@@ -20,7 +20,7 @@ import {
 
   R_SPACE,
   R_FLOAT
-} from './helpers'
+} from './helpers/base'
 
 import {
   _cloneHide,
@@ -29,19 +29,19 @@ import {
   _matches,
   _throttle,
   _extend
-} from './utils'
+} from './helpers/utils'
 
 import {
   _toggleClass,
   _css,
   _find
-} from './css_helpers'
+} from './helpers/css'
 
 import {
   _on,
   _off,
   _dispatchEvent
-} from './event_helpers'
+} from './helpers/events'
 
 const Sortable = (function sortableFactory() {
   'use strict';
