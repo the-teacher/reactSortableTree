@@ -2,14 +2,51 @@
 // * @author  RubaXa   <trash@rubaxa.org>
 // * @license MIT
 
-const Sortable = (function sortableFactory() {
-  "use strict";
+import {
+  log
+} from '../shared/helpers'
 
-  if (typeof window === "undefined" || !window.document) {
-    return function sortableError() {
-      throw new Error("Sortable.js requires a window with a document");
-    }
-  }
+import {
+  win,
+  doc,
+
+  raiseExceptionIfNotBrowserEnvironment,
+  detectSupportActiveMode,
+
+  clone,
+  toInt,
+  setTimeout,
+  newTag,
+
+  R_SPACE,
+  R_FLOAT
+} from './helpers'
+
+import {
+  _cloneHide,
+  _closest,
+  _getParentOrHost,
+  _matches,
+  _throttle,
+  _extend
+} from './utils'
+
+import {
+  _toggleClass,
+  _css,
+  _find
+} from './css_helpers'
+
+import {
+  _on,
+  _off,
+  _dispatchEvent
+} from './event_helpers'
+
+const Sortable = (function sortableFactory() {
+  'use strict';
+
+  raiseExceptionIfNotBrowserEnvironment()
 
   var dragEl,
     parentEl,
@@ -41,31 +78,15 @@ const Sortable = (function sortableFactory() {
     moved,
 
     forRepaintDummy,
-
-    /** @const */
-    R_SPACE = /\s+/g,
-    R_FLOAT = /left|right|inline/,
-
     expando = 'Sortable' + (new Date).getTime(),
+    supportDraggable = ('draggable' in newTag('div')),
 
-    win = window,
-    document = win.document,
-    parseInt = win.parseInt,
-    setTimeout = win.setTimeout,
-
-    $ = win.jQuery || win.Zepto,
-    Polymer = win.Polymer,
-
-    captureMode = false,
-    passiveMode = false,
-
-    supportDraggable = ('draggable' in document.createElement('div')),
     supportCssPointerEvents = (function (el) {
       // false when IE11
       if (!!navigator.userAgent.match(/(?:Trident.*rv[ :]?11\.|msie)/i)) {
         return false;
       }
-      el = document.createElement('x');
+      el = newTag('x')
       el.style.cssText = 'pointer-events:auto';
       return el.style.pointerEvents === 'auto';
     })(),
@@ -210,20 +231,7 @@ const Sortable = (function sortableFactory() {
     }
   ;
 
-  // Detect support a passive mode
-  try {
-    window.addEventListener('test', null, Object.defineProperty({}, 'passive', {
-      get: function () {
-        // `false`, because everything starts to work incorrectly and instead of d'n'd,
-        // begins the page has scrolled.
-        passiveMode = false;
-        captureMode = {
-          capture: false,
-          passive: passiveMode
-        };
-      }
-    }));
-  } catch (err) {}
+  detectSupportActiveMode()
 
   /**
    * @class  Sortable
@@ -267,7 +275,7 @@ const Sortable = (function sortableFactory() {
       dragoverBubble: false,
       dataIdAttr: 'data-id',
       delay: 0,
-      touchStartThreshold: parseInt(window.devicePixelRatio, 10) || 1,
+      touchStartThreshold: toInt(window.devicePixelRatio) || 1,
       forceFallback: false,
       fallbackClass: 'sortable-fallback',
       fallbackOnBody: false,
@@ -360,7 +368,7 @@ const Sortable = (function sortableFactory() {
       // Check filter
       if (typeof filter === 'function') {
         if (filter.call(this, evt, target, this)) {
-          _dispatchEvent(_this, originalTarget, 'filter', target, el, el, startIndex);
+          _dispatchEvent(_this, cloneEl, originalTarget, 'filter', target, el, el, startIndex);
           preventOnFilter && evt.preventDefault();
           return; // cancel dnd
         }
@@ -370,7 +378,7 @@ const Sortable = (function sortableFactory() {
           criteria = _closest(originalTarget, criteria.trim(), el);
 
           if (criteria) {
-            _dispatchEvent(_this, criteria, 'filter', target, el, el, startIndex);
+            _dispatchEvent(_this, cloneEl, criteria, 'filter', target, el, el, startIndex);
             return true;
           }
         });
@@ -427,7 +435,7 @@ const Sortable = (function sortableFactory() {
           _this._triggerDragStart(evt, touch);
 
           // Drag start event
-          _dispatchEvent(_this, rootEl, 'choose', dragEl, rootEl, rootEl, oldIndex);
+          _dispatchEvent(_this, cloneEl, rootEl, 'choose', dragEl, rootEl, rootEl, oldIndex);
         };
 
         // Disable "draggable"
@@ -501,10 +509,10 @@ const Sortable = (function sortableFactory() {
       }
 
       try {
-        if (document.selection) {
+        if (doc.selection) {
           // Timeout neccessary for IE9
           _nextTick(function () {
-            document.selection.empty();
+            doc.selection.empty();
           });
         } else {
           window.getSelection().removeAllRanges();
@@ -524,7 +532,7 @@ const Sortable = (function sortableFactory() {
         Sortable.active = this;
 
         // Drag start event
-        _dispatchEvent(this, rootEl, 'start', dragEl, rootEl, rootEl, oldIndex);
+        _dispatchEvent(this, cloneEl, rootEl, 'start', dragEl, rootEl, rootEl, oldIndex);
       } else {
         this._nulling();
       }
@@ -543,7 +551,7 @@ const Sortable = (function sortableFactory() {
           _css(ghostEl, 'display', 'none');
         }
 
-        var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
+        var target = doc.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
         var parent = target;
         var i = touchDragOverListeners.length;
 
@@ -629,8 +637,8 @@ const Sortable = (function sortableFactory() {
         _toggleClass(ghostEl, options.fallbackClass, true);
         _toggleClass(ghostEl, options.dragClass, true);
 
-        _css(ghostEl, 'top', rect.top - parseInt(css.marginTop, 10));
-        _css(ghostEl, 'left', rect.left - parseInt(css.marginLeft, 10));
+        _css(ghostEl, 'top', rect.top - toInt(css.marginTop));
+        _css(ghostEl, 'left', rect.left - toInt(css.marginLeft));
         _css(ghostEl, 'width', rect.width);
         _css(ghostEl, 'height', rect.height);
         _css(ghostEl, 'opacity', '0.8');
@@ -638,7 +646,7 @@ const Sortable = (function sortableFactory() {
         _css(ghostEl, 'zIndex', '100000');
         _css(ghostEl, 'pointerEvents', 'none');
 
-        options.fallbackOnBody && document.body.appendChild(ghostEl) || rootEl.appendChild(ghostEl);
+        options.fallbackOnBody && doc.body.appendChild(ghostEl) || rootEl.appendChild(ghostEl);
 
         // Fixing dimensions.
         ghostRect = ghostEl.getBoundingClientRect();
@@ -648,26 +656,26 @@ const Sortable = (function sortableFactory() {
     },
 
     _onDragStart: function (/**Event*/evt, /**boolean*/useFallback) {
-      var _this = this;
-      var dataTransfer = evt.dataTransfer;
-      var options = _this.options;
+      var _this = this
+      var dataTransfer = evt.dataTransfer
+      var options = _this.options
 
-      _this._offUpEvents();
+      _this._offUpEvents()
 
       if (activeGroup.checkPull(_this, _this, dragEl, evt)) {
-        cloneEl = _clone(dragEl);
+        cloneEl = clone(dragEl)
 
-        cloneEl.draggable = false;
-        cloneEl.style['will-change'] = '';
+        cloneEl.draggable = false
+        cloneEl.style['will-change'] = ''
 
-        _css(cloneEl, 'display', 'none');
-        _toggleClass(cloneEl, _this.options.chosenClass, false);
+        _css(cloneEl, 'display', 'none')
+        _toggleClass(cloneEl, _this.options.chosenClass, false)
 
         // #1143: IFrame support workaround
         _this._cloneId = _nextTick(function () {
           rootEl.insertBefore(cloneEl, dragEl);
-          _dispatchEvent(_this, rootEl, 'clone', dragEl);
-        });
+          _dispatchEvent(_this, cloneEl, rootEl, 'clone', dragEl)
+        })
       }
 
       _toggleClass(dragEl, options.dragClass, true);
@@ -761,7 +769,7 @@ const Sortable = (function sortableFactory() {
         }
 
         if (revert) {
-          _cloneHide(activeSortable, true);
+          _cloneHide(activeSortable, cloneEl, true);
           parentEl = rootEl; // actualization
 
           if (cloneEl || nextEl) {
@@ -791,7 +799,7 @@ const Sortable = (function sortableFactory() {
             targetRect = target.getBoundingClientRect();
           }
 
-          _cloneHide(activeSortable, isOwner);
+          _cloneHide(activeSortable, cloneEl, isOwner);
 
           if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt) !== false) {
             if (!dragEl.contains(el)) {
@@ -847,9 +855,9 @@ const Sortable = (function sortableFactory() {
             }
 
             _silent = true;
-            setTimeout(_unsilent, 30);
+            setTimeout(function () { _silent = false }, 30)
 
-            _cloneHide(activeSortable, isOwner);
+            _cloneHide(activeSortable, cloneEl, isOwner);
 
             if (!dragEl.contains(el)) {
               if (after && !nextSibling) {
@@ -959,21 +967,21 @@ const Sortable = (function sortableFactory() {
           _toggleClass(dragEl, this.options.chosenClass, false);
 
           // Drag stop event
-          _dispatchEvent(this, rootEl, 'unchoose', dragEl, parentEl, rootEl, oldIndex, null, evt);
+          _dispatchEvent(this, cloneEl, rootEl, 'unchoose', dragEl, parentEl, rootEl, oldIndex, null, evt);
 
           if (rootEl !== parentEl) {
             newIndex = _index(dragEl, options.draggable);
 
             if (newIndex >= 0) {
               // Add event
-              _dispatchEvent(null, parentEl, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+              _dispatchEvent(null, cloneEl, parentEl, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 
               // Remove event
-              _dispatchEvent(this, rootEl, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+              _dispatchEvent(this, cloneEl, rootEl, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 
               // drag from one list and drop into another
-              _dispatchEvent(null, parentEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
-              _dispatchEvent(this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+              _dispatchEvent(null, cloneEl, parentEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+              _dispatchEvent(this, cloneEl, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
             }
           }
           else {
@@ -983,8 +991,8 @@ const Sortable = (function sortableFactory() {
 
               if (newIndex >= 0) {
                 // drag & drop within the same list
-                _dispatchEvent(this, rootEl, 'update', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
-                _dispatchEvent(this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+                _dispatchEvent(this, cloneEl, rootEl, 'update', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+                _dispatchEvent(this, cloneEl, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
               }
             }
           }
@@ -995,7 +1003,7 @@ const Sortable = (function sortableFactory() {
               newIndex = oldIndex;
             }
 
-            _dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+            _dispatchEvent(this, cloneEl, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 
             // Save sorting
             this.save();
@@ -1182,152 +1190,11 @@ const Sortable = (function sortableFactory() {
     }
   };
 
-
-  function _cloneHide(sortable, state) {
-    if (sortable.lastPullMode !== 'clone') {
-      state = true;
-    }
-
-    if (cloneEl && (cloneEl.state !== state)) {
-      _css(cloneEl, 'display', state ? 'none' : '');
-
-      if (!state) {
-        if (cloneEl.state) {
-          if (sortable.options.group.revertClone) {
-            rootEl.insertBefore(cloneEl, nextEl);
-            sortable._animate(dragEl, cloneEl);
-          } else {
-            rootEl.insertBefore(cloneEl, dragEl);
-          }
-        }
-      }
-
-      cloneEl.state = state;
-    }
-  }
-
-
-  function _closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx) {
-    if (el) {
-      ctx = ctx || document;
-
-      do {
-        if ((selector === '>*' && el.parentNode === ctx) || _matches(el, selector)) {
-          return el;
-        }
-        /* jshint boss:true */
-      } while (el = _getParentOrHost(el));
-    }
-
-    return null;
-  }
-
-
-  function _getParentOrHost(el) {
-    var parent = el.host;
-
-    return (parent && parent.nodeType) ? parent : el.parentNode;
-  }
-
-
   function _globalDragOver(/**Event*/evt) {
     if (evt.dataTransfer) {
       evt.dataTransfer.dropEffect = 'move';
     }
     evt.preventDefault();
-  }
-
-
-  function _on(el, event, fn) {
-    el.addEventListener(event, fn, captureMode);
-  }
-
-
-  function _off(el, event, fn) {
-    el.removeEventListener(event, fn, captureMode);
-  }
-
-
-  function _toggleClass(el, name, state) {
-    if (el) {
-      if (el.classList) {
-        el.classList[state ? 'add' : 'remove'](name);
-      }
-      else {
-        var className = (' ' + el.className + ' ').replace(R_SPACE, ' ').replace(' ' + name + ' ', ' ');
-        el.className = (className + (state ? ' ' + name : '')).replace(R_SPACE, ' ');
-      }
-    }
-  }
-
-
-  function _css(el, prop, val) {
-    var style = el && el.style;
-
-    if (style) {
-      if (val === void 0) {
-        if (document.defaultView && document.defaultView.getComputedStyle) {
-          val = document.defaultView.getComputedStyle(el, '');
-        }
-        else if (el.currentStyle) {
-          val = el.currentStyle;
-        }
-
-        return prop === void 0 ? val : val[prop];
-      }
-      else {
-        if (!(prop in style)) {
-          prop = '-webkit-' + prop;
-        }
-
-        style[prop] = val + (typeof val === 'string' ? '' : 'px');
-      }
-    }
-  }
-
-
-  function _find(ctx, tagName, iterator) {
-    if (ctx) {
-      var list = ctx.getElementsByTagName(tagName), i = 0, n = list.length;
-
-      if (iterator) {
-        for (; i < n; i++) {
-          iterator(list[i], i);
-        }
-      }
-
-      return list;
-    }
-
-    return [];
-  }
-
-
-
-  function _dispatchEvent(sortable, rootEl, name, targetEl, toEl, fromEl, startIndex, newIndex, originalEvt) {
-    sortable = (sortable || rootEl[expando]);
-
-    var evt = document.createEvent('Event'),
-      options = sortable.options,
-      onName = 'on' + name.charAt(0).toUpperCase() + name.substr(1);
-
-    evt.initEvent(name, true, true);
-
-    evt.to = toEl || rootEl;
-    evt.from = fromEl || rootEl;
-    evt.item = targetEl || rootEl;
-    evt.clone = cloneEl;
-
-    evt.oldIndex = startIndex;
-    evt.newIndex = newIndex;
-
-    evt.originalEvent = originalEvt;
-
-    rootEl.dispatchEvent(evt);
-
-    if (options[onName]) {
-      options[onName].call(sortable, evt);
-    }
   }
 
 
@@ -1337,7 +1204,7 @@ const Sortable = (function sortableFactory() {
       onMoveFn = sortable.options.onMove,
       retVal;
 
-    evt = document.createEvent('Event');
+    evt = doc.createEvent('Event');
     evt.initEvent('move', true, true);
 
     evt.to = toEl;
@@ -1363,12 +1230,6 @@ const Sortable = (function sortableFactory() {
   function _disableDraggable(el) {
     el.draggable = false;
   }
-
-
-  function _unsilent() {
-    _silent = false;
-  }
-
 
   /** @returns {HTMLElement|false} */
   function _ghostIsLast(el, evt) {
@@ -1423,66 +1284,6 @@ const Sortable = (function sortableFactory() {
     return index;
   }
 
-  function _matches(/**HTMLElement*/el, /**String*/selector) {
-    if (el) {
-      try {
-        if (el.matches) {
-          return el.matches(selector);
-        } else if (el.msMatchesSelector) {
-          return el.msMatchesSelector(selector);
-        }
-      } catch(_) {
-        return false;
-      }
-    }
-
-    return false;
-  }
-
-  function _throttle(callback, ms) {
-    var args, _this;
-
-    return function () {
-      if (args === void 0) {
-        args = arguments;
-        _this = this;
-
-        setTimeout(function () {
-          if (args.length === 1) {
-            callback.call(_this, args[0]);
-          } else {
-            callback.apply(_this, args);
-          }
-
-          args = void 0;
-        }, ms);
-      }
-    };
-  }
-
-  function _extend(dst, src) {
-    if (dst && src) {
-      for (var key in src) {
-        if (src.hasOwnProperty(key)) {
-          dst[key] = src[key];
-        }
-      }
-    }
-
-    return dst;
-  }
-
-  function _clone(el) {
-    if (Polymer && Polymer.dom) {
-      return Polymer.dom(el).cloneNode(true);
-    }
-    else if ($) {
-      return $(el).clone(true)[0];
-    }
-    else {
-      return el.cloneNode(true);
-    }
-  }
 
   function _saveInputCheckedState(root) {
     savedInputChecked.length = 0;
@@ -1524,7 +1325,7 @@ const Sortable = (function sortableFactory() {
     throttle: _throttle,
     closest: _closest,
     toggleClass: _toggleClass,
-    clone: _clone,
+    clone: clone,
     index: _index,
     nextTick: _nextTick,
     cancelNextTick: _cancelNextTick

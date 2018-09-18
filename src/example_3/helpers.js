@@ -1,0 +1,57 @@
+const raiseExceptionIfNotBrowserEnvironment = () => {
+  const NotBrowserEnv = typeof window === 'undefined' || !window.document
+  if (NotBrowserEnv) throw new Error('Sortable.js requires a window with a document')
+}
+
+const detectSupportActiveMode = () => {
+  try {
+    window.addEventListener('test', null, Object.defineProperty({}, 'passive', {
+      get: function () {
+        // `false`, because everything starts to work incorrectly and instead of d'n'd,
+        // begins the page has scrolled.
+        passiveMode = false;
+        captureMode = {
+          capture: false,
+          passive: passiveMode
+        };
+      }
+    }));
+  } catch (err) {}
+}
+
+const R_SPACE = /\s+/g
+const R_FLOAT = /left|right|inline/
+
+const win = window
+const doc = document
+
+const toInt = (val) => win.parseInt(val, 10)
+const setTimeout = win.setTimeout
+
+const newTag = (name) => doc.createElement(name)
+
+// UI Lib specific
+const $ = win.jQuery || win.Zepto
+const Polymer = win.Polymer
+
+const clone = (el) => {
+  if (Polymer && Polymer.dom) { return Polymer.dom(el).cloneNode(true) }
+  else if ($) { return $(el).clone(true)[0] }
+  else { return el.cloneNode(true) }
+}
+
+export {
+  win,
+  doc,
+
+  raiseExceptionIfNotBrowserEnvironment,
+  detectSupportActiveMode,
+
+  clone,
+  toInt,
+  setTimeout,
+  newTag,
+
+  R_SPACE,
+  R_FLOAT
+}
