@@ -7,8 +7,8 @@ import {
 } from '../shared/helpers'
 
 import {
-  win,
-  doc,
+  win, doc,
+  abs, min,
 
   raiseExceptionIfNotBrowserEnvironment,
   detectSupportActiveMode,
@@ -28,7 +28,10 @@ import {
   _getParentOrHost,
   _matches,
   _throttle,
-  _extend
+  _extend,
+  _autoScroll,
+  _prepareGroup,
+  supportCssPointerEvents
 } from './helpers/utils'
 
 import {
@@ -45,6 +48,8 @@ import {
 
 const Sortable = (function sortableFactory() {
   'use strict';
+
+  const expando = 'Sortable' + (new Date).getTime()
 
   raiseExceptionIfNotBrowserEnvironment()
 
@@ -78,157 +83,10 @@ const Sortable = (function sortableFactory() {
     moved,
 
     forRepaintDummy,
-    expando = 'Sortable' + (new Date).getTime(),
-    supportDraggable = ('draggable' in newTag('div')),
-
-    supportCssPointerEvents = (function (el) {
-      // false when IE11
-      if (!!navigator.userAgent.match(/(?:Trident.*rv[ :]?11\.|msie)/i)) {
-        return false;
-      }
-      el = newTag('x')
-      el.style.cssText = 'pointer-events:auto';
-      return el.style.pointerEvents === 'auto';
-    })(),
 
     _silent = false,
-
-    abs = Math.abs,
-    min = Math.min,
-
     savedInputChecked = [],
-    touchDragOverListeners = [],
-
-    alwaysFalse = function () { return false; },
-
-    _autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl) {
-      // Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
-      if (rootEl && options.scroll) {
-        var _this = rootEl[expando],
-          el,
-          rect,
-          sens = options.scrollSensitivity,
-          speed = options.scrollSpeed,
-
-          x = evt.clientX,
-          y = evt.clientY,
-
-          winWidth = window.innerWidth,
-          winHeight = window.innerHeight,
-
-          vx,
-          vy,
-
-          scrollOffsetX,
-          scrollOffsetY
-        ;
-
-        // Delect scrollEl
-        if (scrollParentEl !== rootEl) {
-          scrollEl = options.scroll;
-          scrollParentEl = rootEl;
-          scrollCustomFn = options.scrollFn;
-
-          if (scrollEl === true) {
-            scrollEl = rootEl;
-
-            do {
-              if ((scrollEl.offsetWidth < scrollEl.scrollWidth) ||
-                (scrollEl.offsetHeight < scrollEl.scrollHeight)
-              ) {
-                break;
-              }
-              /* jshint boss:true */
-            } while (scrollEl = scrollEl.parentNode);
-          }
-        }
-
-        if (scrollEl) {
-          el = scrollEl;
-          rect = scrollEl.getBoundingClientRect();
-          vx = (abs(rect.right - x) <= sens) - (abs(rect.left - x) <= sens);
-          vy = (abs(rect.bottom - y) <= sens) - (abs(rect.top - y) <= sens);
-        }
-
-
-        if (!(vx || vy)) {
-          vx = (winWidth - x <= sens) - (x <= sens);
-          vy = (winHeight - y <= sens) - (y <= sens);
-
-          /* jshint expr:true */
-          (vx || vy) && (el = win);
-        }
-
-
-        if (autoScroll.vx !== vx || autoScroll.vy !== vy || autoScroll.el !== el) {
-          autoScroll.el = el;
-          autoScroll.vx = vx;
-          autoScroll.vy = vy;
-
-          clearInterval(autoScroll.pid);
-
-          if (el) {
-            autoScroll.pid = setInterval(function () {
-              scrollOffsetY = vy ? vy * speed : 0;
-              scrollOffsetX = vx ? vx * speed : 0;
-
-              if ('function' === typeof(scrollCustomFn)) {
-                if (scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt, touchEvt, el) !== 'continue') {
-                  return;
-                }
-              }
-
-              if (el === win) {
-                win.scrollTo(win.pageXOffset + scrollOffsetX, win.pageYOffset + scrollOffsetY);
-              } else {
-                el.scrollTop += scrollOffsetY;
-                el.scrollLeft += scrollOffsetX;
-              }
-            }, 24);
-          }
-        }
-      }
-    }, 30),
-
-    _prepareGroup = function (options) {
-      function toFn(value, pull) {
-        if (value == null || value === true) {
-          value = group.name;
-          if (value == null) {
-            return alwaysFalse;
-          }
-        }
-
-        if (typeof value === 'function') {
-          return value;
-        } else {
-          return function (to, from) {
-            var fromGroup = from.options.group.name;
-
-            return pull
-              ? value
-              : value && (value.join
-                ? value.indexOf(fromGroup) > -1
-                : (fromGroup == value)
-              );
-          };
-        }
-      }
-
-      var group = {};
-      var originalGroup = options.group;
-
-      if (!originalGroup || typeof originalGroup != 'object') {
-        originalGroup = {name: originalGroup};
-      }
-
-      group.name = originalGroup.name;
-      group.checkPull = toFn(originalGroup.pull, true);
-      group.checkPut = toFn(originalGroup.put);
-      group.revertClone = originalGroup.revertClone;
-
-      options.group = group;
-    }
+    touchDragOverListeners = []
   ;
 
   detectSupportActiveMode()
@@ -300,6 +158,7 @@ const Sortable = (function sortableFactory() {
     }
 
     // Setup drag mode
+    const supportDraggable = 'draggable' in newTag('div')
     this.nativeDraggable = options.forceFallback ? false : supportDraggable;
 
     // Bind events
@@ -754,7 +613,7 @@ const Sortable = (function sortableFactory() {
         (evt.rootEl === void 0 || evt.rootEl === this.el) // touch fallback
       ) {
         // Smart auto-scrolling
-        _autoScroll(evt, options, this.el);
+        _autoScroll(evt, options, this.el, expando, scrollParentEl, autoScroll);
 
         if (_silent) {
           return;
@@ -769,7 +628,7 @@ const Sortable = (function sortableFactory() {
         }
 
         if (revert) {
-          _cloneHide(activeSortable, cloneEl, true);
+          _cloneHide(activeSortable, rootEl, cloneEl, dragEl, true);
           parentEl = rootEl; // actualization
 
           if (cloneEl || nextEl) {
@@ -799,7 +658,7 @@ const Sortable = (function sortableFactory() {
             targetRect = target.getBoundingClientRect();
           }
 
-          _cloneHide(activeSortable, cloneEl, isOwner);
+          _cloneHide(activeSortable, rootEl, cloneEl, dragEl, isOwner);
 
           if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt) !== false) {
             if (!dragEl.contains(el)) {
@@ -857,7 +716,7 @@ const Sortable = (function sortableFactory() {
             _silent = true;
             setTimeout(function () { _silent = false }, 30)
 
-            _cloneHide(activeSortable, cloneEl, isOwner);
+            _cloneHide(activeSortable, rootEl, cloneEl, dragEl, isOwner);
 
             if (!dragEl.contains(el)) {
               if (after && !nextSibling) {

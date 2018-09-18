@@ -25,6 +25,9 @@ const R_FLOAT = /left|right|inline/
 const win = window
 const doc = document
 
+const abs = Math.abs
+const min = Math.min
+
 const toInt = (val) => win.parseInt(val, 10)
 const setTimeout = win.setTimeout
 
@@ -44,6 +47,9 @@ export {
   win,
   doc,
 
+  abs,
+  min,
+  
   raiseExceptionIfNotBrowserEnvironment,
   detectSupportActiveMode,
 
