@@ -1,3 +1,5 @@
+import { _css } from './css'
+
 function _cloneHide(sortable, cloneEl, state) {
   if (sortable.lastPullMode !== 'clone') {
     state = true;
@@ -91,11 +93,11 @@ function _extend(dst, src) {
   return dst;
 }
 
-module.exports = {
-  _cloneHide: _cloneHide,
-  _closest: _closest,
-  _getParentOrHost: _getParentOrHost,
-  _matches: _matches,
-  _throttle: _throttle,
-  _extend: _extend
+export {
+  _cloneHide,
+  _closest,
+  _getParentOrHost,
+  _matches,
+  _throttle,
+  _extend
 }

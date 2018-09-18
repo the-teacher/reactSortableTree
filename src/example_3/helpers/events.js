@@ -10,7 +10,7 @@ function _off(el, event, fn) {
   el.removeEventListener(event, fn, captureMode);
 }
 
-function _dispatchEvent(sortable, cloneEl, rootEl, name, targetEl, toEl, fromEl, startIndex, newIndex, originalEvt) {
+function _dispatchEvent(sortable, rootEl, cloneEl, expando, name, targetEl, toEl, fromEl, startIndex, newIndex, originalEvt) {
   sortable = (sortable || rootEl[expando]);
 
   var evt = doc.createEvent('Event'),

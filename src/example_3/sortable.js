@@ -368,7 +368,7 @@ const Sortable = (function sortableFactory() {
       // Check filter
       if (typeof filter === 'function') {
         if (filter.call(this, evt, target, this)) {
-          _dispatchEvent(_this, cloneEl, originalTarget, 'filter', target, el, el, startIndex);
+          _dispatchEvent(_this, originalTarget, cloneEl, expando, 'filter', target, el, el, startIndex);
           preventOnFilter && evt.preventDefault();
           return; // cancel dnd
         }
@@ -378,7 +378,7 @@ const Sortable = (function sortableFactory() {
           criteria = _closest(originalTarget, criteria.trim(), el);
 
           if (criteria) {
-            _dispatchEvent(_this, cloneEl, criteria, 'filter', target, el, el, startIndex);
+            _dispatchEvent(_this, criteria, cloneEl, expando, 'filter', target, el, el, startIndex);
             return true;
           }
         });
@@ -435,7 +435,7 @@ const Sortable = (function sortableFactory() {
           _this._triggerDragStart(evt, touch);
 
           // Drag start event
-          _dispatchEvent(_this, cloneEl, rootEl, 'choose', dragEl, rootEl, rootEl, oldIndex);
+          _dispatchEvent(_this, rootEl, cloneEl, expando, 'choose', dragEl, rootEl, rootEl, oldIndex);
         };
 
         // Disable "draggable"
@@ -532,7 +532,7 @@ const Sortable = (function sortableFactory() {
         Sortable.active = this;
 
         // Drag start event
-        _dispatchEvent(this, cloneEl, rootEl, 'start', dragEl, rootEl, rootEl, oldIndex);
+        _dispatchEvent(this, rootEl, cloneEl, expando, 'start', dragEl, rootEl, rootEl, oldIndex);
       } else {
         this._nulling();
       }
@@ -674,7 +674,7 @@ const Sortable = (function sortableFactory() {
         // #1143: IFrame support workaround
         _this._cloneId = _nextTick(function () {
           rootEl.insertBefore(cloneEl, dragEl);
-          _dispatchEvent(_this, cloneEl, rootEl, 'clone', dragEl)
+          _dispatchEvent(_this, rootEl, cloneEl, expando, 'clone', dragEl)
         })
       }
 
@@ -967,21 +967,21 @@ const Sortable = (function sortableFactory() {
           _toggleClass(dragEl, this.options.chosenClass, false);
 
           // Drag stop event
-          _dispatchEvent(this, cloneEl, rootEl, 'unchoose', dragEl, parentEl, rootEl, oldIndex, null, evt);
+          _dispatchEvent(this, rootEl, cloneEl, expando, 'unchoose', dragEl, parentEl, rootEl, oldIndex, null, evt);
 
           if (rootEl !== parentEl) {
             newIndex = _index(dragEl, options.draggable);
 
             if (newIndex >= 0) {
               // Add event
-              _dispatchEvent(null, cloneEl, parentEl, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+              _dispatchEvent(null, parentEl, cloneEl, expando, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 
               // Remove event
-              _dispatchEvent(this, cloneEl, rootEl, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+              _dispatchEvent(this, rootEl, cloneEl, expando, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 
               // drag from one list and drop into another
-              _dispatchEvent(null, cloneEl, parentEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
-              _dispatchEvent(this, cloneEl, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+              _dispatchEvent(null, parentEl, cloneEl, expando, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+              _dispatchEvent(this, rootEl, cloneEl, expando, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
             }
           }
           else {
@@ -991,8 +991,8 @@ const Sortable = (function sortableFactory() {
 
               if (newIndex >= 0) {
                 // drag & drop within the same list
-                _dispatchEvent(this, cloneEl, rootEl, 'update', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
-                _dispatchEvent(this, cloneEl, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+                _dispatchEvent(this, rootEl, cloneEl, expando, 'update', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+                _dispatchEvent(this, rootEl, cloneEl, expando, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
               }
             }
           }
@@ -1003,7 +1003,7 @@ const Sortable = (function sortableFactory() {
               newIndex = oldIndex;
             }
 
-            _dispatchEvent(this, cloneEl, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+            _dispatchEvent(this, rootEl, cloneEl, expando, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 
             // Save sorting
             this.save();
