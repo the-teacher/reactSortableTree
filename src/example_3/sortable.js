@@ -683,18 +683,18 @@ const Sortable = (function sortableFactory() {
       if (useFallback) {
         if (useFallback === 'touch') {
           // Bind touch events
-          _on(document, 'touchmove', _this._onTouchMove);
-          _on(document, 'touchend', _this._onDrop);
-          _on(document, 'touchcancel', _this._onDrop);
+          _on(doc, 'touchmove', _this._onTouchMove);
+          _on(doc, 'touchend', _this._onDrop);
+          _on(doc, 'touchcancel', _this._onDrop);
 
           if (options.supportPointer) {
-            _on(document, 'pointermove', _this._onTouchMove);
-            _on(document, 'pointerup', _this._onDrop);
+            _on(doc, 'pointermove', _this._onTouchMove);
+            _on(doc, 'pointerup', _this._onDrop);
           }
         } else {
           // Old brwoser
-          _on(document, 'mousemove', _this._onTouchMove);
-          _on(document, 'mouseup', _this._onDrop);
+          _on(doc, 'mousemove', _this._onTouchMove);
+          _on(doc, 'mouseup', _this._onDrop);
         }
 
         _this._loopId = setInterval(_this._emulateDragOver, 50);
@@ -705,12 +705,12 @@ const Sortable = (function sortableFactory() {
           options.setData && options.setData.call(_this, dataTransfer, dragEl);
         }
 
-        _on(document, 'drop', _this);
+        _on(doc, 'drop', _this);
 
         // #1143: Бывает элемент с IFrame внутри блокирует `drop`,
         // поэтому если вызвался `mouseover`, значит надо отменять весь d'n'd.
         // Breaking Chrome 62+
-        // _on(document, 'mouseover', _this);
+        // _on(doc, 'mouseover', _this);
 
         _this._dragStartId = _nextTick(_this._dragStarted);
       }
@@ -909,8 +909,8 @@ const Sortable = (function sortableFactory() {
     _offUpEvents: function () {
       var ownerDocument = this.el.ownerDocument;
 
-      _off(document, 'touchmove', this._onTouchMove);
-      _off(document, 'pointermove', this._onTouchMove);
+      _off(doc, 'touchmove', this._onTouchMove);
+      _off(doc, 'pointermove', this._onTouchMove);
       _off(ownerDocument, 'mouseup', this._onDrop);
       _off(ownerDocument, 'touchend', this._onDrop);
       _off(ownerDocument, 'pointerup', this._onDrop);
@@ -931,11 +931,11 @@ const Sortable = (function sortableFactory() {
       _cancelNextTick(this._dragStartId);
 
       // Unbind events
-      _off(document, 'mouseover', this);
-      _off(document, 'mousemove', this._onTouchMove);
+      _off(doc, 'mouseover', this);
+      _off(doc, 'mousemove', this._onTouchMove);
 
       if (this.nativeDraggable) {
-        _off(document, 'drop', this);
+        _off(doc, 'drop', this);
         _off(el, 'dragstart', this._onDragStart);
       }
 
@@ -1306,7 +1306,7 @@ const Sortable = (function sortableFactory() {
   }
 
   // Fixed #973:
-  _on(document, 'touchmove', function (evt) {
+  _on(doc, 'touchmove', function (evt) {
     if (Sortable.active) {
       evt.preventDefault();
     }
