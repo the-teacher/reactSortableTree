@@ -47,6 +47,10 @@ import {
   _dispatchEvent
 } from './helpers/events'
 
+import {
+  _triggerDragStart
+} from './helpers/handlers'
+
 const Sortable = (function sortableFactory() {
   'use strict';
 
@@ -131,7 +135,7 @@ const Sortable = (function sortableFactory() {
       dragoverBubble: false,
       dataIdAttr: 'data-id',
       delay: 0,
-      touchStartThreshold: toInt(window.devicePixelRatio) || 1,
+      touchStartThreshold: toInt(win.devicePixelRatio) || 1,
       forceFallback: false,
       fallbackClass: 'sortable-fallback',
       fallbackOnBody: false,
@@ -289,7 +293,7 @@ const Sortable = (function sortableFactory() {
           _toggleClass(dragEl, options.chosenClass, true);
 
           // Bind the events: dragstart/dragend
-          _this._triggerDragStart(evt, touch);
+          _triggerDragStart.bind(_this)(evt, touch, rootEl, dragEl);
 
           // Drag start event
           _dispatchEvent(_this, rootEl, cloneEl, expando, 'choose', dragEl, rootEl, rootEl, oldIndex);
@@ -342,40 +346,6 @@ const Sortable = (function sortableFactory() {
       _off(ownerDocument, 'mousemove', this._disableDelayedDrag);
       _off(ownerDocument, 'touchmove', this._disableDelayedDrag);
       _off(ownerDocument, 'pointermove', this._disableDelayedDrag);
-    },
-
-    _triggerDragStart: function (/** Event */evt, /** Touch */touch) {
-      touch = touch || (evt.pointerType == 'touch' ? evt : null);
-
-      if (touch) {
-        // Touch device support
-        tapEvt = {
-          target: dragEl,
-          clientX: touch.clientX,
-          clientY: touch.clientY
-        };
-
-        this._onDragStart(tapEvt, 'touch');
-      }
-      else if (!this.nativeDraggable) {
-        this._onDragStart(tapEvt, true);
-      }
-      else {
-        _on(dragEl, 'dragend', this);
-        _on(rootEl, 'dragstart', this._onDragStart);
-      }
-
-      try {
-        if (doc.selection) {
-          // Timeout neccessary for IE9
-          _nextTick(function () {
-            doc.selection.empty();
-          });
-        } else {
-          window.getSelection().removeAllRanges();
-        }
-      } catch (err) {
-      }
     },
 
     _dragStarted: function () {
