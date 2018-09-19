@@ -12,6 +12,7 @@ import {
 
   raiseExceptionIfNotBrowserEnvironment,
   detectSupportActiveMode,
+  htmlElementIsRequired,
 
   clone,
   toInt,
@@ -97,13 +98,10 @@ const Sortable = (function sortableFactory() {
    * @param  {Object}       [options]
    */
   function Sortable(el, options) {
-    if (!(el && el.nodeType && el.nodeType === 1)) {
-      throw 'Sortable: `el` must be HTMLElement, and not ' + {}.toString.call(el);
-    }
+    htmlElementIsRequired(el)
 
     this.el = el; // root element
     this.options = options = _extend({}, options);
-
 
     // Export instance
     el[expando] = this;
@@ -142,7 +140,6 @@ const Sortable = (function sortableFactory() {
       supportPointer: Sortable.supportPointer !== false
     };
 
-
     // Set default options
     for (var name in defaults) {
       !(name in options) && (options[name] = defaults[name]);
@@ -164,6 +161,7 @@ const Sortable = (function sortableFactory() {
     // Bind events
     _on(el, 'mousedown', this._onTapStart);
     _on(el, 'touchstart', this._onTapStart);
+
     options.supportPointer && _on(el, 'pointerdown', this._onTapStart);
 
     if (this.nativeDraggable) {
@@ -445,7 +443,6 @@ const Sortable = (function sortableFactory() {
         }
       }
     },
-
 
     _onTouchMove: function (/**TouchEvent*/evt) {
       if (tapEvt) {
@@ -930,7 +927,6 @@ const Sortable = (function sortableFactory() {
       }
     },
 
-
     /**
      * Serializes the item into an array of string.
      * @returns {String[]}
@@ -952,7 +948,6 @@ const Sortable = (function sortableFactory() {
 
       return order;
     },
-
 
     /**
      * Sorts the elements according to the array.
@@ -977,7 +972,6 @@ const Sortable = (function sortableFactory() {
       });
     },
 
-
     /**
      * Save the current sorting
      */
@@ -985,7 +979,6 @@ const Sortable = (function sortableFactory() {
       var store = this.options.store;
       store && store.set(this);
     },
-
 
     /**
      * For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.
@@ -996,7 +989,6 @@ const Sortable = (function sortableFactory() {
     closest: function (el, selector) {
       return _closest(el, selector || this.options.draggable, this.el);
     },
-
 
     /**
      * Set/get option
@@ -1017,7 +1009,6 @@ const Sortable = (function sortableFactory() {
         }
       }
     },
-
 
     /**
      * Destroy
@@ -1056,7 +1047,6 @@ const Sortable = (function sortableFactory() {
     evt.preventDefault();
   }
 
-
   function _onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvt, willInsertAfter) {
     var evt,
       sortable = fromEl[expando],
@@ -1085,7 +1075,6 @@ const Sortable = (function sortableFactory() {
     return retVal;
   }
 
-
   function _disableDraggable(el) {
     el.draggable = false;
   }
@@ -1100,7 +1089,6 @@ const Sortable = (function sortableFactory() {
     return (evt.clientY - (rect.top + rect.height) > 5) ||
       (evt.clientX - (rect.left + rect.width) > 5);
   }
-
 
   /**
    * Generate id
@@ -1142,7 +1130,6 @@ const Sortable = (function sortableFactory() {
 
     return index;
   }
-
 
   function _saveInputCheckedState(root) {
     savedInputChecked.length = 0;
@@ -1190,7 +1177,6 @@ const Sortable = (function sortableFactory() {
     cancelNextTick: _cancelNextTick
   };
 
-
   /**
    * Create sortable instance
    * @param {HTMLElement}  el
@@ -1199,7 +1185,6 @@ const Sortable = (function sortableFactory() {
   Sortable.create = function (el, options) {
     return new Sortable(el, options);
   };
-
 
   // Export
   Sortable.version = '1.7.0';

@@ -19,6 +19,12 @@ const detectSupportActiveMode = () => {
   } catch (err) {}
 }
 
+const htmlElementIsRequired = (el) => {
+  if (!(el && el.nodeType && el.nodeType === 1)) {
+    throw 'Sortable: `el` must be HTMLElement, and not ' + {}.toString.call(el)
+  }
+}
+
 const R_SPACE = /\s+/g
 const R_FLOAT = /left|right|inline/
 
@@ -49,9 +55,10 @@ export {
 
   abs,
   min,
-  
+
   raiseExceptionIfNotBrowserEnvironment,
   detectSupportActiveMode,
+  htmlElementIsRequired,
 
   clone,
   toInt,
