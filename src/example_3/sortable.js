@@ -172,8 +172,87 @@ const Sortable = (function () {
         }
       }
     }
-    
-    this.el = el; // root element
+    this._onTapStart = function (e) {
+      var _this = this,
+        el = this.el,
+        options = this.options,
+        preventOnFilter = options.preventOnFilter,
+        type = e.type,
+        touch = e.touches && e.touches[0],
+        target = (touch || e).target,
+        originalTarget = e.target.shadowRoot && (e.path && e.path[0]) || target,
+        filter = options.filter,
+        startIndex;
+
+      _saveInputCheckedState(el);
+
+      // Don't trigger start event when an element is been dragged, otherwise the e.oldindex always wrong when set option.group.
+      if (dragEl) {
+        return;
+      }
+
+      if (/mousedown|pointerdown/.test(type) && e.button !== 0 || options.disabled) {
+        return; // only left button or enabled
+      }
+
+      // cancel dnd if original target is content editable
+      if (originalTarget.isContentEditable) {
+        return;
+      }
+
+      target = _closest(target, options.draggable, el);
+
+      if (!target) {
+        return;
+      }
+
+      if (lastDownEl === target) {
+        // Ignoring duplicate `down`
+        return;
+      }
+
+      // Get the index of the dragged element within its parent
+      startIndex = _index(target, options.draggable);
+
+      // Check filter
+      if (typeof filter === 'function') {
+        if (filter.call(this, e, target, this)) {
+          _dispatchEvent(_this, originalTarget, cloneEl, 'filter', target, el, el, startIndex);
+          preventOnFilter && e.preventDefault();
+          return; // cancel dnd
+        }
+      }
+      else if (filter) {
+        filter = filter.split(',').some(function (criteria) {
+          criteria = _closest(originalTarget, criteria.trim(), el);
+
+          if (criteria) {
+            _dispatchEvent(_this, criteria, cloneEl, 'filter', target, el, el, startIndex);
+            return true;
+          }
+        });
+
+        if (filter) {
+          preventOnFilter && e.preventDefault();
+          return; // cancel dnd
+        }
+      }
+
+      if (options.handle && !_closest(originalTarget, options.handle, el)) {
+        return;
+      }
+
+      // Prepare `dragstart`
+      this._prepareDragStart(e, touch, target, startIndex);
+    }
+    this._delayedDragTouchMoveHandler = function (e) {
+      if (min(abs(e.clientX - this._lastX), abs(e.clientY - this._lastY)) >= this.options.touchStartThreshold) {
+        this._disableDelayedDrag();
+      }
+    }
+
+    // root element
+    this.el = el;
     this.options = options = _extend({}, options);
 
     // Export instance
@@ -250,87 +329,6 @@ const Sortable = (function () {
 
   Sortable.prototype = {
     constructor: Sortable,
-
-    _onTapStart: function (e) {
-      var _this = this,
-        el = this.el,
-        options = this.options,
-        preventOnFilter = options.preventOnFilter,
-        type = e.type,
-        touch = e.touches && e.touches[0],
-        target = (touch || e).target,
-        originalTarget = e.target.shadowRoot && (e.path && e.path[0]) || target,
-        filter = options.filter,
-        startIndex;
-
-      _saveInputCheckedState(el);
-
-
-      // Don't trigger start event when an element is been dragged, otherwise the e.oldindex always wrong when set option.group.
-      if (dragEl) {
-        return;
-      }
-
-      if (/mousedown|pointerdown/.test(type) && e.button !== 0 || options.disabled) {
-        return; // only left button or enabled
-      }
-
-      // cancel dnd if original target is content editable
-      if (originalTarget.isContentEditable) {
-        return;
-      }
-
-      target = _closest(target, options.draggable, el);
-
-      if (!target) {
-        return;
-      }
-
-      if (lastDownEl === target) {
-        // Ignoring duplicate `down`
-        return;
-      }
-
-      // Get the index of the dragged element within its parent
-      startIndex = _index(target, options.draggable);
-
-      // Check filter
-      if (typeof filter === 'function') {
-        if (filter.call(this, e, target, this)) {
-          _dispatchEvent(_this, originalTarget, cloneEl, 'filter', target, el, el, startIndex);
-          preventOnFilter && e.preventDefault();
-          return; // cancel dnd
-        }
-      }
-      else if (filter) {
-        filter = filter.split(',').some(function (criteria) {
-          criteria = _closest(originalTarget, criteria.trim(), el);
-
-          if (criteria) {
-            _dispatchEvent(_this, criteria, cloneEl, 'filter', target, el, el, startIndex);
-            return true;
-          }
-        });
-
-        if (filter) {
-          preventOnFilter && e.preventDefault();
-          return; // cancel dnd
-        }
-      }
-
-      if (options.handle && !_closest(originalTarget, options.handle, el)) {
-        return;
-      }
-
-      // Prepare `dragstart`
-      this._prepareDragStart(e, touch, target, startIndex);
-    },
-
-    _delayedDragTouchMoveHandler: function (e) {
-      if (min(abs(e.clientX - this._lastX), abs(e.clientY - this._lastY)) >= this.options.touchStartThreshold) {
-        this._disableDelayedDrag();
-      }
-    },
 
     _disableDelayedDrag: function () {
       var ownerDocument = this.el.ownerDocument;
