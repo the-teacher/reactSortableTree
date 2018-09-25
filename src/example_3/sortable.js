@@ -57,7 +57,7 @@ import {
   _triggerDragStart
 } from './helpers/handlers'
 
-const Sortable = (function sortableFactory() {
+const Sortable = (function () {
   'use strict';
 
   raiseExceptionIfNotBrowserEnvironment()
@@ -177,7 +177,6 @@ const Sortable = (function sortableFactory() {
     // Restore sorting
     options.store && this.sort(options.store.get(this));
   }
-
 
   Sortable.prototype = {
     constructor: Sortable,
