@@ -104,7 +104,7 @@ const Sortable = (function () {
     htmlElementIsRequired(el)
 
     this._prepareDragStart = function (e, touch, target, startIndex) {
-      log('step 1')
+      log('step 2')
       var _this = this,
         el = _this.el,
         options = _this.options,
@@ -610,87 +610,7 @@ const Sortable = (function () {
         }
       }
     }
-
-    // root element
-    this.el = el;
-    this.options = options = _extend({}, options);
-
-    // Export instance
-    el.sortableInstance = this;
-
-    // Default options
-    var defaults = {
-      group: null,
-      sort: true,
-      disabled: false,
-      store: null,
-      handle: null,
-      scroll: true,
-      scrollSensitivity: 30,
-      scrollSpeed: 10,
-      draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
-      ghostClass: 'sortable-ghost',
-      chosenClass: 'sortable-chosen',
-      dragClass: 'sortable-drag',
-      ignore: 'a, img',
-      filter: null,
-      preventOnFilter: true,
-      animation: 0,
-      setData: function (dataTransfer, dragEl) {
-        dataTransfer.setData('Text', dragEl.textContent);
-      },
-      dropBubble: false,
-      dragoverBubble: false,
-      dataIdAttr: 'data-id',
-      delay: 0,
-      touchStartThreshold: toInt(win.devicePixelRatio) || 1,
-      forceFallback: false,
-      fallbackClass: 'sortable-fallback',
-      fallbackOnBody: false,
-      fallbackTolerance: 0,
-      fallbackOffset: {x: 0, y: 0},
-      supportPointer: Sortable.supportPointer !== false
-    };
-
-    // Set default options
-    for (var name in defaults) {
-      !(name in options) && (options[name] = defaults[name]);
-    }
-
-    _prepareGroup(options);
-
-    // Bind all private methods
-    for (var fn in this) {
-      if (fn.charAt(0) === '_' && typeof this[fn] === 'function') {
-        this[fn] = this[fn].bind(this);
-      }
-    }
-
-    // Setup drag mode
-    const supportDraggable = 'draggable' in newTag('div')
-    this.nativeDraggable = options.forceFallback ? false : supportDraggable;
-
-    // Bind events
-    _on(el, 'mousedown', this._onTapStart);
-    _on(el, 'touchstart', this._onTapStart);
-
-    options.supportPointer && _on(el, 'pointerdown', this._onTapStart);
-
-    if (this.nativeDraggable) {
-      _on(el, 'dragover', this);
-      _on(el, 'dragenter', this);
-    }
-
-    touchDragOverListeners.push(this._onDragOver);
-
-    // Restore sorting
-    options.store && this.sort(options.store.get(this));
-  }
-
-  Sortable.prototype = {
-    constructor: Sortable,
-
-    _animate: function (prevRect, target) {
+    this._animate = function (prevRect, target) {
       var ms = this.options.animation;
 
       if (ms) {
@@ -718,9 +638,8 @@ const Sortable = (function () {
           target.animated = false;
         }, ms);
       }
-    },
-
-    _offUpEvents: function () {
+    }
+    this._offUpEvents = function () {
       var ownerDocument = this.el.ownerDocument;
 
       _off(doc, 'touchmove', this._onTouchMove);
@@ -731,9 +650,8 @@ const Sortable = (function () {
       _off(ownerDocument, 'touchcancel', this._onDrop);
       _off(ownerDocument, 'pointercancel', this._onDrop);
       _off(ownerDocument, 'selectstart', this);
-    },
-
-    _onDrop: function (e) {
+    }
+    this._onDrop = function (e) {
       var el = this.el,
         options = this.options;
 
@@ -827,9 +745,8 @@ const Sortable = (function () {
       }
 
       this._nulling();
-    },
-
-    _nulling: function() {
+    }
+    this._nulling = function() {
       rootEl =
       dragEl =
       parentEl =
@@ -858,9 +775,8 @@ const Sortable = (function () {
         el.checked = true;
       });
       savedInputChecked.length = 0;
-    },
-
-    handleEvent: function (e) {
+    }
+    this.handleEvent = function (e) {
       switch (e.type) {
         case 'drop':
         case 'dragend':
@@ -883,9 +799,8 @@ const Sortable = (function () {
           e.preventDefault();
           break;
       }
-    },
-
-    toArray: function () {
+    }
+    this.toArray = function () {
       var order = [],
         el,
         children = this.el.children,
@@ -901,9 +816,8 @@ const Sortable = (function () {
       }
 
       return order;
-    },
-
-    sort: function (order) {
+    }
+    this.sort = function (order) {
       var items = {}, rootEl = this.el;
 
       this.toArray().forEach(function (id, i) {
@@ -920,7 +834,86 @@ const Sortable = (function () {
           rootEl.appendChild(items[id]);
         }
       });
-    },
+    }
+
+    // root element
+    this.el = el;
+    this.options = options = _extend({}, options);
+
+    // Export instance
+    el.sortableInstance = this;
+
+    // Default options
+    var defaults = {
+      group: null,
+      sort: true,
+      disabled: false,
+      store: null,
+      handle: null,
+      scroll: true,
+      scrollSensitivity: 30,
+      scrollSpeed: 10,
+      draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
+      ghostClass: 'sortable-ghost',
+      chosenClass: 'sortable-chosen',
+      dragClass: 'sortable-drag',
+      ignore: 'a, img',
+      filter: null,
+      preventOnFilter: true,
+      animation: 0,
+      setData: function (dataTransfer, dragEl) {
+        dataTransfer.setData('Text', dragEl.textContent);
+      },
+      dropBubble: false,
+      dragoverBubble: false,
+      dataIdAttr: 'data-id',
+      delay: 0,
+      touchStartThreshold: toInt(win.devicePixelRatio) || 1,
+      forceFallback: false,
+      fallbackClass: 'sortable-fallback',
+      fallbackOnBody: false,
+      fallbackTolerance: 0,
+      fallbackOffset: {x: 0, y: 0},
+      supportPointer: Sortable.supportPointer !== false
+    };
+
+    // Set default options
+    for (var name in defaults) {
+      !(name in options) && (options[name] = defaults[name]);
+    }
+
+    _prepareGroup(options);
+
+    // Bind all private methods
+    for (var fn in this) {
+      if (fn.charAt(0) === '_' && typeof this[fn] === 'function') {
+        this[fn] = this[fn].bind(this);
+      }
+    }
+
+    // Setup drag mode
+    const supportDraggable = 'draggable' in newTag('div')
+    this.nativeDraggable = options.forceFallback ? false : supportDraggable;
+
+    // Bind events
+    _on(el, 'mousedown', this._onTapStart);
+    _on(el, 'touchstart', this._onTapStart);
+
+    options.supportPointer && _on(el, 'pointerdown', this._onTapStart);
+
+    if (this.nativeDraggable) {
+      _on(el, 'dragover', this);
+      _on(el, 'dragenter', this);
+    }
+
+    touchDragOverListeners.push(this._onDragOver);
+
+    // Restore sorting
+    options.store && this.sort(options.store.get(this));
+  }
+
+  Sortable.prototype = {
+    constructor: Sortable,
 
     save: function () {
       var store = this.options.store;
