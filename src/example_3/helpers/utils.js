@@ -269,6 +269,17 @@ function _index(el, selector) {
   return index;
 }
 
+function _globalDragOver(e) {
+  if (e.dataTransfer) {
+    e.dataTransfer.dropEffect = 'move';
+  }
+  e.preventDefault();
+}
+
+function _disableDraggable(el) {
+  el.draggable = false;
+}
+
 export {
   _cloneHide,
   _closest,
@@ -282,5 +293,7 @@ export {
   _nextTick,
   _cancelNextTick,
   _generateId,
-  _index
+  _index,
+  _globalDragOver,
+  _disableDraggable
 }

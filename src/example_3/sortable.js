@@ -36,7 +36,9 @@ import {
   _nextTick,
   _cancelNextTick,
   _generateId,
-  _index
+  _index,
+  _globalDragOver,
+  _disableDraggable
 } from './helpers/utils'
 
 import {
@@ -981,13 +983,6 @@ const Sortable = (function sortableFactory() {
     }
   };
 
-  function _globalDragOver(e) {
-    if (e.dataTransfer) {
-      e.dataTransfer.dropEffect = 'move';
-    }
-    e.preventDefault();
-  }
-
   function _onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvt, willInsertAfter) {
     var e,
       sortable = fromEl.sortableInstance,
@@ -1014,10 +1009,6 @@ const Sortable = (function sortableFactory() {
     }
 
     return retVal;
-  }
-
-  function _disableDraggable(el) {
-    el.draggable = false;
   }
 
   function _ghostIsLast(el, e) {
