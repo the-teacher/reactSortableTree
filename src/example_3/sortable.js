@@ -103,6 +103,76 @@ const Sortable = (function () {
   function Sortable(el, options) {
     htmlElementIsRequired(el)
 
+    this._prepareDragStart = function (e, touch, target, startIndex) {
+      var _this = this,
+        el = _this.el,
+        options = _this.options,
+        ownerDocument = el.ownerDocument,
+        dragStartFn;
+
+      if (target && !dragEl && (target.parentNode === el)) {
+        tapEvt = e;
+
+        rootEl = el;
+        dragEl = target;
+        parentEl = dragEl.parentNode;
+        nextEl = dragEl.nextSibling;
+        lastDownEl = target;
+        activeGroup = options.group;
+        oldIndex = startIndex;
+
+        this._lastX = (touch || e).clientX;
+        this._lastY = (touch || e).clientY;
+
+        dragEl.style['will-change'] = 'all';
+
+        dragStartFn = function () {
+          // Delayed drag has been triggered
+          // we can re-enable the events: touchmove/mousemove
+          _this._disableDelayedDrag();
+
+          // Make the element draggable
+          dragEl.draggable = _this.nativeDraggable;
+
+          // Chosen item
+          _toggleClass(dragEl, options.chosenClass, true);
+
+          // Bind the events: dragstart/dragend
+          _triggerDragStart.bind(_this)(e, touch, rootEl, dragEl);
+
+          // Drag start event
+          _dispatchEvent(_this, rootEl, cloneEl, 'choose', dragEl, rootEl, rootEl, oldIndex);
+        };
+
+        // Disable "draggable"
+        options.ignore.split(',').forEach(function (criteria) {
+          _find(dragEl, criteria.trim(), _disableDraggable);
+        });
+
+        _on(ownerDocument, 'mouseup', _this._onDrop);
+        _on(ownerDocument, 'touchend', _this._onDrop);
+        _on(ownerDocument, 'touchcancel', _this._onDrop);
+        _on(ownerDocument, 'selectstart', _this);
+        options.supportPointer && _on(ownerDocument, 'pointercancel', _this._onDrop);
+
+        if (options.delay) {
+          // If the user moves the pointer or let go the click or touch
+          // before the delay has been reached:
+          // disable the delayed drag
+          _on(ownerDocument, 'mouseup', _this._disableDelayedDrag);
+          _on(ownerDocument, 'touchend', _this._disableDelayedDrag);
+          _on(ownerDocument, 'touchcancel', _this._disableDelayedDrag);
+          _on(ownerDocument, 'mousemove', _this._disableDelayedDrag);
+          _on(ownerDocument, 'touchmove', _this._delayedDragTouchMoveHandler);
+          options.supportPointer && _on(ownerDocument, 'pointermove', _this._delayedDragTouchMoveHandler);
+
+          _this._dragStartTimer = setTimeout(dragStartFn, options.delay);
+        } else {
+          dragStartFn();
+        }
+      }
+    }
+    
     this.el = el; // root element
     this.options = options = _extend({}, options);
 
@@ -254,78 +324,6 @@ const Sortable = (function () {
 
       // Prepare `dragstart`
       this._prepareDragStart(e, touch, target, startIndex);
-    },
-
-    _prepareDragStart: function (e, touch, target, startIndex) {
-      var _this = this,
-        el = _this.el,
-        options = _this.options,
-        ownerDocument = el.ownerDocument,
-        dragStartFn;
-
-      if (target && !dragEl && (target.parentNode === el)) {
-        tapEvt = e;
-
-        rootEl = el;
-        dragEl = target;
-        parentEl = dragEl.parentNode;
-        nextEl = dragEl.nextSibling;
-        lastDownEl = target;
-        activeGroup = options.group;
-        oldIndex = startIndex;
-
-        this._lastX = (touch || e).clientX;
-        this._lastY = (touch || e).clientY;
-
-        dragEl.style['will-change'] = 'all';
-
-        dragStartFn = function () {
-          // Delayed drag has been triggered
-          // we can re-enable the events: touchmove/mousemove
-          _this._disableDelayedDrag();
-
-          // Make the element draggable
-          dragEl.draggable = _this.nativeDraggable;
-
-          // Chosen item
-          _toggleClass(dragEl, options.chosenClass, true);
-
-          // Bind the events: dragstart/dragend
-          _triggerDragStart.bind(_this)(e, touch, rootEl, dragEl);
-
-          // Drag start event
-          _dispatchEvent(_this, rootEl, cloneEl, 'choose', dragEl, rootEl, rootEl, oldIndex);
-        };
-
-        // Disable "draggable"
-        options.ignore.split(',').forEach(function (criteria) {
-          _find(dragEl, criteria.trim(), _disableDraggable);
-        });
-
-        _on(ownerDocument, 'mouseup', _this._onDrop);
-        _on(ownerDocument, 'touchend', _this._onDrop);
-        _on(ownerDocument, 'touchcancel', _this._onDrop);
-        _on(ownerDocument, 'selectstart', _this);
-        options.supportPointer && _on(ownerDocument, 'pointercancel', _this._onDrop);
-
-        if (options.delay) {
-          // If the user moves the pointer or let go the click or touch
-          // before the delay has been reached:
-          // disable the delayed drag
-          _on(ownerDocument, 'mouseup', _this._disableDelayedDrag);
-          _on(ownerDocument, 'touchend', _this._disableDelayedDrag);
-          _on(ownerDocument, 'touchcancel', _this._disableDelayedDrag);
-          _on(ownerDocument, 'mousemove', _this._disableDelayedDrag);
-          _on(ownerDocument, 'touchmove', _this._delayedDragTouchMoveHandler);
-          options.supportPointer && _on(ownerDocument, 'pointermove', _this._delayedDragTouchMoveHandler);
-
-          _this._dragStartTimer = setTimeout(dragStartFn, options.delay);
-        } else {
-          dragStartFn();
-        }
-
-
-      }
     },
 
     _delayedDragTouchMoveHandler: function (e) {
