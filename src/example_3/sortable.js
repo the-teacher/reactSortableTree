@@ -83,6 +83,7 @@ const Sortable = (function () {
 
     activeGroup,
     putSortable,
+    activeSortableItem,
 
     autoScroll = {},
 
@@ -270,7 +271,7 @@ const Sortable = (function () {
         _toggleClass(dragEl, options.ghostClass, true);
         _toggleClass(dragEl, options.dragClass, false);
 
-        Sortable.active = this;
+        activeSortableItem = this;
 
         // Drag start event
         _dispatchEvent(this, rootEl, cloneEl, 'start', dragEl, rootEl, rootEl, oldIndex);
@@ -337,7 +338,7 @@ const Sortable = (function () {
           translate3d = e.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
         // only set the status to dragging, when we are actually dragging
-        if (!Sortable.active) {
+        if (!activeSortableItem) {
           if (fallbackTolerance &&
             min(abs(touch.clientX - this._lastX), abs(touch.clientY - this._lastY)) < fallbackTolerance
           ) {
@@ -459,7 +460,7 @@ const Sortable = (function () {
         revert,
         options = this.options,
         group = options.group,
-        activeSortable = Sortable.active,
+        activeSortable = activeSortableItem,
         isOwner = (activeGroup === group),
         isMovingBetweenSortable = false,
         canSort = options.sort;
@@ -681,7 +682,7 @@ const Sortable = (function () {
 
         ghostEl && ghostEl.parentNode && ghostEl.parentNode.removeChild(ghostEl);
 
-        if (rootEl === parentEl || Sortable.active.lastPullMode !== 'clone') {
+        if (rootEl === parentEl || activeSortableItem.lastPullMode !== 'clone') {
           // Remove clone
           cloneEl && cloneEl.parentNode && cloneEl.parentNode.removeChild(cloneEl);
         }
@@ -729,7 +730,7 @@ const Sortable = (function () {
             }
           }
 
-          if (Sortable.active) {
+          if (activeSortableItem) {
             /* jshint eqnull:true */
             if (newIndex == null || newIndex === -1) {
               newIndex = oldIndex;
@@ -769,7 +770,7 @@ const Sortable = (function () {
 
       putSortable =
       activeGroup =
-      Sortable.active = null;
+      activeSortableItem = null;
 
       savedInputChecked.forEach(function (el) {
         el.checked = true;
@@ -1009,7 +1010,7 @@ const Sortable = (function () {
 
   // Fixed #973:
   _on(doc, 'touchmove', function (e) {
-    if (Sortable.active) {
+    if (activeSortableItem) {
       e.preventDefault();
     }
   });
