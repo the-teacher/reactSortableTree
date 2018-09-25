@@ -176,27 +176,27 @@ const Sortable = (function sortableFactory() {
   Sortable.prototype = {
     constructor: Sortable,
 
-    _onTapStart: function (evt) {
+    _onTapStart: function (e) {
       var _this = this,
         el = this.el,
         options = this.options,
         preventOnFilter = options.preventOnFilter,
-        type = evt.type,
-        touch = evt.touches && evt.touches[0],
-        target = (touch || evt).target,
-        originalTarget = evt.target.shadowRoot && (evt.path && evt.path[0]) || target,
+        type = e.type,
+        touch = e.touches && e.touches[0],
+        target = (touch || e).target,
+        originalTarget = e.target.shadowRoot && (e.path && e.path[0]) || target,
         filter = options.filter,
         startIndex;
 
       _saveInputCheckedState(el);
 
 
-      // Don't trigger start event when an element is been dragged, otherwise the evt.oldindex always wrong when set option.group.
+      // Don't trigger start event when an element is been dragged, otherwise the e.oldindex always wrong when set option.group.
       if (dragEl) {
         return;
       }
 
-      if (/mousedown|pointerdown/.test(type) && evt.button !== 0 || options.disabled) {
+      if (/mousedown|pointerdown/.test(type) && e.button !== 0 || options.disabled) {
         return; // only left button or enabled
       }
 
@@ -221,9 +221,9 @@ const Sortable = (function sortableFactory() {
 
       // Check filter
       if (typeof filter === 'function') {
-        if (filter.call(this, evt, target, this)) {
+        if (filter.call(this, e, target, this)) {
           _dispatchEvent(_this, originalTarget, cloneEl, 'filter', target, el, el, startIndex);
-          preventOnFilter && evt.preventDefault();
+          preventOnFilter && e.preventDefault();
           return; // cancel dnd
         }
       }
@@ -238,7 +238,7 @@ const Sortable = (function sortableFactory() {
         });
 
         if (filter) {
-          preventOnFilter && evt.preventDefault();
+          preventOnFilter && e.preventDefault();
           return; // cancel dnd
         }
       }
@@ -248,10 +248,10 @@ const Sortable = (function sortableFactory() {
       }
 
       // Prepare `dragstart`
-      this._prepareDragStart(evt, touch, target, startIndex);
+      this._prepareDragStart(e, touch, target, startIndex);
     },
 
-    _prepareDragStart: function (evt, touch, target, startIndex) {
+    _prepareDragStart: function (e, touch, target, startIndex) {
       var _this = this,
         el = _this.el,
         options = _this.options,
@@ -259,7 +259,7 @@ const Sortable = (function sortableFactory() {
         dragStartFn;
 
       if (target && !dragEl && (target.parentNode === el)) {
-        tapEvt = evt;
+        tapEvt = e;
 
         rootEl = el;
         dragEl = target;
@@ -269,8 +269,8 @@ const Sortable = (function sortableFactory() {
         activeGroup = options.group;
         oldIndex = startIndex;
 
-        this._lastX = (touch || evt).clientX;
-        this._lastY = (touch || evt).clientY;
+        this._lastX = (touch || e).clientX;
+        this._lastY = (touch || e).clientY;
 
         dragEl.style['will-change'] = 'all';
 
@@ -286,7 +286,7 @@ const Sortable = (function sortableFactory() {
           _toggleClass(dragEl, options.chosenClass, true);
 
           // Bind the events: dragstart/dragend
-          _triggerDragStart.bind(_this)(evt, touch, rootEl, dragEl);
+          _triggerDragStart.bind(_this)(e, touch, rootEl, dragEl);
 
           // Drag start event
           _dispatchEvent(_this, rootEl, cloneEl, 'choose', dragEl, rootEl, rootEl, oldIndex);
@@ -407,15 +407,15 @@ const Sortable = (function sortableFactory() {
       }
     },
 
-    _onTouchMove: function (evt) {
+    _onTouchMove: function (e) {
       if (tapEvt) {
         var  options = this.options,
           fallbackTolerance = options.fallbackTolerance,
           fallbackOffset = options.fallbackOffset,
-          touch = evt.touches ? evt.touches[0] : evt,
+          touch = e.touches ? e.touches[0] : e,
           dx = (touch.clientX - tapEvt.clientX) + fallbackOffset.x,
           dy = (touch.clientY - tapEvt.clientY) + fallbackOffset.y,
-          translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
+          translate3d = e.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
         // only set the status to dragging, when we are actually dragging
         if (!Sortable.active) {
@@ -439,7 +439,7 @@ const Sortable = (function sortableFactory() {
         _css(ghostEl, 'msTransform', translate3d);
         _css(ghostEl, 'transform', translate3d);
 
-        evt.preventDefault();
+        e.preventDefault();
       }
     },
 
@@ -474,14 +474,14 @@ const Sortable = (function sortableFactory() {
       }
     },
 
-    _onDragStart: function (evt, useFallback) {
+    _onDragStart: function (e, useFallback) {
       var _this = this
-      var dataTransfer = evt.dataTransfer
+      var dataTransfer = e.dataTransfer
       var options = _this.options
 
       _this._offUpEvents()
 
-      if (activeGroup.checkPull(_this, _this, dragEl, evt)) {
+      if (activeGroup.checkPull(_this, _this, dragEl, e)) {
         cloneEl = clone(dragEl)
 
         cloneEl.draggable = false
@@ -535,7 +535,7 @@ const Sortable = (function sortableFactory() {
       }
     },
 
-    _onDragOver: function (evt) {
+    _onDragOver: function (e) {
       var el = this.el,
         target,
         dragRect,
@@ -548,9 +548,9 @@ const Sortable = (function sortableFactory() {
         isMovingBetweenSortable = false,
         canSort = options.sort;
 
-      if (evt.preventDefault !== void 0) {
-        evt.preventDefault();
-        !options.dragoverBubble && evt.stopPropagation();
+      if (e.preventDefault !== void 0) {
+        e.preventDefault();
+        !options.dragoverBubble && e.stopPropagation();
       }
 
       if (dragEl.animated) {
@@ -565,21 +565,21 @@ const Sortable = (function sortableFactory() {
           : (
             putSortable === this ||
             (
-              (activeSortable.lastPullMode = activeGroup.checkPull(this, activeSortable, dragEl, evt)) &&
-              group.checkPut(this, activeSortable, dragEl, evt)
+              (activeSortable.lastPullMode = activeGroup.checkPull(this, activeSortable, dragEl, e)) &&
+              group.checkPut(this, activeSortable, dragEl, e)
             )
           )
         ) &&
-        (evt.rootEl === void 0 || evt.rootEl === this.el) // touch fallback
+        (e.rootEl === void 0 || e.rootEl === this.el) // touch fallback
       ) {
         // Smart auto-scrolling
-        _autoScroll(evt, options, this.el, scrollParentEl, autoScroll);
+        _autoScroll(e, options, this.el, scrollParentEl, autoScroll);
 
         if (_silent) {
           return;
         }
 
-        target = _closest(evt.target, options.draggable, el);
+        target = _closest(e.target, options.draggable, el);
         dragRect = dragEl.getBoundingClientRect();
 
         if (putSortable !== this) {
@@ -603,10 +603,10 @@ const Sortable = (function sortableFactory() {
 
 
         if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
-          (el === evt.target) && (_ghostIsLast(el, evt))
+          (el === e.target) && (_ghostIsLast(el, e))
         ) {
           //assign target only if condition is true
-          if (el.children.length !== 0 && el.children[0] !== ghostEl && el === evt.target) {
+          if (el.children.length !== 0 && el.children[0] !== ghostEl && el === e.target) {
             target = el.lastElementChild;
           }
 
@@ -620,7 +620,7 @@ const Sortable = (function sortableFactory() {
 
           _cloneHide(activeSortable, rootEl, cloneEl, dragEl, isOwner);
 
-          if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt) !== false) {
+          if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, e) !== false) {
             if (!dragEl.contains(el)) {
               el.appendChild(dragEl);
               parentEl = el; // actualization
@@ -645,7 +645,7 @@ const Sortable = (function sortableFactory() {
               || (lastParentCSS.display == 'flex' && lastParentCSS['flex-direction'].indexOf('row') === 0),
             isWide = (target.offsetWidth > dragEl.offsetWidth),
             isLong = (target.offsetHeight > dragEl.offsetHeight),
-            halfway = (floating ? (evt.clientX - targetRect.left) / width : (evt.clientY - targetRect.top) / height) > 0.5,
+            halfway = (floating ? (e.clientX - targetRect.left) / width : (e.clientY - targetRect.top) / height) > 0.5,
             nextSibling = target.nextElementSibling,
             after = false
           ;
@@ -658,7 +658,7 @@ const Sortable = (function sortableFactory() {
               after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide;
             }
             else if (target.previousElementSibling === dragEl || dragEl.previousElementSibling === target) {
-              after = (evt.clientY - targetRect.top) / height > 0.5;
+              after = (e.clientY - targetRect.top) / height > 0.5;
             } else {
               after = tgTop > elTop;
             }
@@ -666,7 +666,7 @@ const Sortable = (function sortableFactory() {
             after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
           }
 
-          var moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, after);
+          var moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, e, after);
 
           if (moveVector !== false) {
             if (moveVector === 1 || moveVector === -1) {
@@ -738,7 +738,7 @@ const Sortable = (function sortableFactory() {
       _off(ownerDocument, 'selectstart', this);
     },
 
-    _onDrop: function (evt) {
+    _onDrop: function (e) {
       var el = this.el,
         options = this.options;
 
@@ -760,10 +760,10 @@ const Sortable = (function sortableFactory() {
 
       this._offUpEvents();
 
-      if (evt) {
+      if (e) {
         if (moved) {
-          evt.preventDefault();
-          !options.dropBubble && evt.stopPropagation();
+          e.preventDefault();
+          !options.dropBubble && e.stopPropagation();
         }
 
         ghostEl && ghostEl.parentNode && ghostEl.parentNode.removeChild(ghostEl);
@@ -786,21 +786,21 @@ const Sortable = (function sortableFactory() {
           _toggleClass(dragEl, this.options.chosenClass, false);
 
           // Drag stop event
-          _dispatchEvent(this, rootEl, cloneEl, 'unchoose', dragEl, parentEl, rootEl, oldIndex, null, evt);
+          _dispatchEvent(this, rootEl, cloneEl, 'unchoose', dragEl, parentEl, rootEl, oldIndex, null, e);
 
           if (rootEl !== parentEl) {
             newIndex = _index(dragEl, options.draggable);
 
             if (newIndex >= 0) {
               // Add event
-              _dispatchEvent(null, parentEl, cloneEl, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+              _dispatchEvent(null, parentEl, cloneEl, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex, e);
 
               // Remove event
-              _dispatchEvent(this, rootEl, cloneEl, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+              _dispatchEvent(this, rootEl, cloneEl, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex, e);
 
               // drag from one list and drop into another
-              _dispatchEvent(null, parentEl, cloneEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
-              _dispatchEvent(this, rootEl, cloneEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+              _dispatchEvent(null, parentEl, cloneEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, e);
+              _dispatchEvent(this, rootEl, cloneEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, e);
             }
           }
           else {
@@ -810,8 +810,8 @@ const Sortable = (function sortableFactory() {
 
               if (newIndex >= 0) {
                 // drag & drop within the same list
-                _dispatchEvent(this, rootEl, cloneEl, 'update', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
-                _dispatchEvent(this, rootEl, cloneEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+                _dispatchEvent(this, rootEl, cloneEl, 'update', dragEl, parentEl, rootEl, oldIndex, newIndex, e);
+                _dispatchEvent(this, rootEl, cloneEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, e);
               }
             }
           }
@@ -822,7 +822,7 @@ const Sortable = (function sortableFactory() {
               newIndex = oldIndex;
             }
 
-            _dispatchEvent(this, rootEl, cloneEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+            _dispatchEvent(this, rootEl, cloneEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, e);
 
             // Save sorting
             this.save();
@@ -865,27 +865,27 @@ const Sortable = (function sortableFactory() {
       savedInputChecked.length = 0;
     },
 
-    handleEvent: function (evt) {
-      switch (evt.type) {
+    handleEvent: function (e) {
+      switch (e.type) {
         case 'drop':
         case 'dragend':
-          this._onDrop(evt);
+          this._onDrop(e);
           break;
 
         case 'dragover':
         case 'dragenter':
           if (dragEl) {
-            this._onDragOver(evt);
-            _globalDragOver(evt);
+            this._onDragOver(e);
+            _globalDragOver(e);
           }
           break;
 
         case 'mouseover':
-          this._onDrop(evt);
+          this._onDrop(e);
           break;
 
         case 'selectstart':
-          evt.preventDefault();
+          e.preventDefault();
           break;
       }
     },
@@ -977,36 +977,36 @@ const Sortable = (function sortableFactory() {
     }
   };
 
-  function _globalDragOver(evt) {
-    if (evt.dataTransfer) {
-      evt.dataTransfer.dropEffect = 'move';
+  function _globalDragOver(e) {
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'move';
     }
-    evt.preventDefault();
+    e.preventDefault();
   }
 
   function _onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvt, willInsertAfter) {
-    var evt,
+    var e,
       sortable = fromEl.sortableInstance,
       onMoveFn = sortable.options.onMove,
       retVal;
 
-    evt = doc.createEvent('Event');
-    evt.initEvent('move', true, true);
+    e = doc.createEvent('Event');
+    e.initEvent('move', true, true);
 
-    evt.to = toEl;
-    evt.from = fromEl;
-    evt.dragged = dragEl;
-    evt.draggedRect = dragRect;
-    evt.related = targetEl || toEl;
-    evt.relatedRect = targetRect || toEl.getBoundingClientRect();
-    evt.willInsertAfter = willInsertAfter;
+    e.to = toEl;
+    e.from = fromEl;
+    e.dragged = dragEl;
+    e.draggedRect = dragRect;
+    e.related = targetEl || toEl;
+    e.relatedRect = targetRect || toEl.getBoundingClientRect();
+    e.willInsertAfter = willInsertAfter;
 
-    evt.originalEvent = originalEvt;
+    e.originalEvent = originalEvt;
 
-    fromEl.dispatchEvent(evt);
+    fromEl.dispatchEvent(e);
 
     if (onMoveFn) {
-      retVal = onMoveFn.call(sortable, evt, originalEvt);
+      retVal = onMoveFn.call(sortable, e, originalEvt);
     }
 
     return retVal;
@@ -1016,14 +1016,14 @@ const Sortable = (function sortableFactory() {
     el.draggable = false;
   }
 
-  function _ghostIsLast(el, evt) {
+  function _ghostIsLast(el, e) {
     var lastEl = el.lastElementChild,
       rect = lastEl.getBoundingClientRect();
 
     // 5 — min delta
     // abs — нельзя добавлять, а то глюки при наведении сверху
-    return (evt.clientY - (rect.top + rect.height) > 5) ||
-      (evt.clientX - (rect.left + rect.width) > 5);
+    return (e.clientY - (rect.top + rect.height) > 5) ||
+      (e.clientX - (rect.left + rect.width) > 5);
   }
 
   function _generateId(el) {
@@ -1075,9 +1075,9 @@ const Sortable = (function sortableFactory() {
   }
 
   // Fixed #973:
-  _on(doc, 'touchmove', function (evt) {
+  _on(doc, 'touchmove', function (e) {
     if (Sortable.active) {
-      evt.preventDefault();
+      e.preventDefault();
     }
   });
 
