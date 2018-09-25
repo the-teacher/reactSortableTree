@@ -103,8 +103,8 @@ const Sortable = (function () {
   function Sortable(el, options) {
     htmlElementIsRequired(el)
 
+    // Implementation functions
     this._prepareDragStart = function (e, touch, target, startIndex) {
-      log('step 2')
       var _this = this,
         el = _this.el,
         options = _this.options,
@@ -835,8 +835,53 @@ const Sortable = (function () {
         }
       });
     }
+    this.save = function () {
+      var store = this.options.store;
+      store && store.set(this);
+    }
+    this.closest = function (el, selector) {
+      return _closest(el, selector || this.options.draggable, this.el);
+    }
+    this.option = function (name, value) {
+      var options = this.options;
 
-    // root element
+      if (value === void 0) {
+        return options[name];
+      } else {
+        options[name] = value;
+
+        if (name === 'group') {
+          _prepareGroup(options);
+        }
+      }
+    }
+    this.destroy = function () {
+      var el = this.el;
+
+      el.sortableInstance = null;
+
+      _off(el, 'mousedown', this._onTapStart);
+      _off(el, 'touchstart', this._onTapStart);
+      _off(el, 'pointerdown', this._onTapStart);
+
+      if (this.nativeDraggable) {
+        _off(el, 'dragover', this);
+        _off(el, 'dragenter', this);
+      }
+
+      // Remove draggable attributes
+      Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {
+        el.removeAttribute('draggable');
+      });
+
+      touchDragOverListeners.splice(touchDragOverListeners.indexOf(this._onDragOver), 1);
+
+      this._onDrop();
+
+      this.el = el = null;
+    }
+
+    // Root element
     this.el = el;
     this.options = options = _extend({}, options);
 
@@ -912,59 +957,6 @@ const Sortable = (function () {
     options.store && this.sort(options.store.get(this));
   }
 
-  Sortable.prototype = {
-    constructor: Sortable,
-
-    save: function () {
-      var store = this.options.store;
-      store && store.set(this);
-    },
-
-    closest: function (el, selector) {
-      return _closest(el, selector || this.options.draggable, this.el);
-    },
-
-    option: function (name, value) {
-      var options = this.options;
-
-      if (value === void 0) {
-        return options[name];
-      } else {
-        options[name] = value;
-
-        if (name === 'group') {
-          _prepareGroup(options);
-        }
-      }
-    },
-
-    destroy: function () {
-      var el = this.el;
-
-      el.sortableInstance = null;
-
-      _off(el, 'mousedown', this._onTapStart);
-      _off(el, 'touchstart', this._onTapStart);
-      _off(el, 'pointerdown', this._onTapStart);
-
-      if (this.nativeDraggable) {
-        _off(el, 'dragover', this);
-        _off(el, 'dragenter', this);
-      }
-
-      // Remove draggable attributes
-      Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {
-        el.removeAttribute('draggable');
-      });
-
-      touchDragOverListeners.splice(touchDragOverListeners.indexOf(this._onDragOver), 1);
-
-      this._onDrop();
-
-      this.el = el = null;
-    }
-  };
-
   function _onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvt, willInsertAfter) {
     var e,
       sortable = fromEl.sortableInstance,
@@ -1023,8 +1015,8 @@ const Sortable = (function () {
   });
 
   Sortable.create = function (el, options) {
-    return new Sortable(el, options);
-  };
+    return new Sortable(el, options)
+  }
 
   // Export
   Sortable.version = '1.7.0';
