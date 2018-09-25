@@ -186,7 +186,7 @@ const Sortable = (function () {
         filter = options.filter,
         startIndex;
 
-      _saveInputCheckedState(el);
+      this._saveInputCheckedState(el);
 
       // Don't trigger start event when an element is been dragged, otherwise the e.oldindex always wrong when set option.group.
       if (dragEl) {
@@ -518,9 +518,8 @@ const Sortable = (function () {
           return;
         }
 
-
         if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
-          (el === e.target) && (_ghostIsLast(el, e))
+          (el === e.target) && (this._ghostIsLast(el, e))
         ) {
           //assign target only if condition is true
           if (el.children.length !== 0 && el.children[0] !== ghostEl && el === e.target) {
@@ -537,7 +536,7 @@ const Sortable = (function () {
 
           _cloneHide(activeSortable, rootEl, cloneEl, dragEl, isOwner);
 
-          if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, e) !== false) {
+          if (this._onMove(rootEl, el, dragEl, dragRect, target, targetRect, e) !== false) {
             if (!dragEl.contains(el)) {
               el.appendChild(dragEl);
               parentEl = el; // actualization
@@ -583,7 +582,7 @@ const Sortable = (function () {
             after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
           }
 
-          var moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, e, after);
+          var moveVector = this._onMove(rootEl, el, dragEl, dragRect, target, targetRect, e, after);
 
           if (moveVector !== false) {
             if (moveVector === 1 || moveVector === -1) {
@@ -881,6 +880,53 @@ const Sortable = (function () {
 
       this.el = el = null;
     }
+    this._onMove = function (fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvt, willInsertAfter) {
+      var e,
+        sortable = fromEl.sortableInstance,
+        onMoveFn = sortable.options.onMove,
+        retVal;
+
+      e = doc.createEvent('Event');
+      e.initEvent('move', true, true);
+
+      e.to = toEl;
+      e.from = fromEl;
+      e.dragged = dragEl;
+      e.draggedRect = dragRect;
+      e.related = targetEl || toEl;
+      e.relatedRect = targetRect || toEl.getBoundingClientRect();
+      e.willInsertAfter = willInsertAfter;
+
+      e.originalEvent = originalEvt;
+
+      fromEl.dispatchEvent(e);
+
+      if (onMoveFn) {
+        retVal = onMoveFn.call(sortable, e, originalEvt);
+      }
+
+      return retVal;
+    }
+    this._ghostIsLast = function (el, e) {
+      var lastEl = el.lastElementChild,
+        rect = lastEl.getBoundingClientRect();
+
+      // 5 — min delta
+      // abs — нельзя добавлять, а то глюки при наведении сверху
+      return (e.clientY - (rect.top + rect.height) > 5) ||
+        (e.clientX - (rect.left + rect.width) > 5);
+    }
+    this._saveInputCheckedState = function (root) {
+      savedInputChecked.length = 0;
+
+      var inputs = root.getElementsByTagName('input');
+      var idx = inputs.length;
+
+      while (idx--) {
+        var el = inputs[idx];
+        el.checked && savedInputChecked.push(el);
+      }
+    }
 
     // Root element
     this.el = el;
@@ -956,56 +1002,6 @@ const Sortable = (function () {
 
     // Restore sorting
     options.store && this.sort(options.store.get(this));
-  }
-
-  function _onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvt, willInsertAfter) {
-    var e,
-      sortable = fromEl.sortableInstance,
-      onMoveFn = sortable.options.onMove,
-      retVal;
-
-    e = doc.createEvent('Event');
-    e.initEvent('move', true, true);
-
-    e.to = toEl;
-    e.from = fromEl;
-    e.dragged = dragEl;
-    e.draggedRect = dragRect;
-    e.related = targetEl || toEl;
-    e.relatedRect = targetRect || toEl.getBoundingClientRect();
-    e.willInsertAfter = willInsertAfter;
-
-    e.originalEvent = originalEvt;
-
-    fromEl.dispatchEvent(e);
-
-    if (onMoveFn) {
-      retVal = onMoveFn.call(sortable, e, originalEvt);
-    }
-
-    return retVal;
-  }
-
-  function _ghostIsLast(el, e) {
-    var lastEl = el.lastElementChild,
-      rect = lastEl.getBoundingClientRect();
-
-    // 5 — min delta
-    // abs — нельзя добавлять, а то глюки при наведении сверху
-    return (e.clientY - (rect.top + rect.height) > 5) ||
-      (e.clientX - (rect.left + rect.width) > 5);
-  }
-
-  function _saveInputCheckedState(root) {
-    savedInputChecked.length = 0;
-
-    var inputs = root.getElementsByTagName('input');
-    var idx = inputs.length;
-
-    while (idx--) {
-      var el = inputs[idx];
-      el.checked && savedInputChecked.push(el);
-    }
   }
 
   // Fixed #973:
