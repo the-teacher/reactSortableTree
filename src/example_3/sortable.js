@@ -94,11 +94,6 @@ const Sortable = (function sortableFactory() {
 
   detectSupportActiveMode()
 
-  /**
-   * @class  Sortable
-   * @param  {HTMLElement}  el
-   * @param  {Object}       [options]
-   */
   function Sortable(el, options) {
     htmlElementIsRequired(el)
 
@@ -178,10 +173,10 @@ const Sortable = (function sortableFactory() {
   }
 
 
-  Sortable.prototype = /** @lends Sortable.prototype */ {
+  Sortable.prototype = {
     constructor: Sortable,
 
-    _onTapStart: function (/** Event|TouchEvent */evt) {
+    _onTapStart: function (evt) {
       var _this = this,
         el = this.el,
         options = this.options,
@@ -256,7 +251,7 @@ const Sortable = (function sortableFactory() {
       this._prepareDragStart(evt, touch, target, startIndex);
     },
 
-    _prepareDragStart: function (/** Event */evt, /** Touch */touch, /** HTMLElement */target, /** Number */startIndex) {
+    _prepareDragStart: function (evt, touch, target, startIndex) {
       var _this = this,
         el = _this.el,
         options = _this.options,
@@ -328,7 +323,7 @@ const Sortable = (function sortableFactory() {
       }
     },
 
-    _delayedDragTouchMoveHandler: function (/** TouchEvent|PointerEvent **/e) {
+    _delayedDragTouchMoveHandler: function (e) {
       if (min(abs(e.clientX - this._lastX), abs(e.clientY - this._lastY)) >= this.options.touchStartThreshold) {
         this._disableDelayedDrag();
       }
@@ -412,7 +407,7 @@ const Sortable = (function sortableFactory() {
       }
     },
 
-    _onTouchMove: function (/**TouchEvent*/evt) {
+    _onTouchMove: function (evt) {
       if (tapEvt) {
         var  options = this.options,
           fallbackTolerance = options.fallbackTolerance,
@@ -479,7 +474,7 @@ const Sortable = (function sortableFactory() {
       }
     },
 
-    _onDragStart: function (/**Event*/evt, /**boolean*/useFallback) {
+    _onDragStart: function (evt, useFallback) {
       var _this = this
       var dataTransfer = evt.dataTransfer
       var options = _this.options
@@ -540,7 +535,7 @@ const Sortable = (function sortableFactory() {
       }
     },
 
-    _onDragOver: function (/**Event*/evt) {
+    _onDragOver: function (evt) {
       var el = this.el,
         target,
         dragRect,
@@ -743,7 +738,7 @@ const Sortable = (function sortableFactory() {
       _off(ownerDocument, 'selectstart', this);
     },
 
-    _onDrop: function (/**Event*/evt) {
+    _onDrop: function (evt) {
       var el = this.el,
         options = this.options;
 
@@ -870,7 +865,7 @@ const Sortable = (function sortableFactory() {
       savedInputChecked.length = 0;
     },
 
-    handleEvent: function (/**Event*/evt) {
+    handleEvent: function (evt) {
       switch (evt.type) {
         case 'drop':
         case 'dragend':
@@ -895,10 +890,6 @@ const Sortable = (function sortableFactory() {
       }
     },
 
-    /**
-     * Serializes the item into an array of string.
-     * @returns {String[]}
-     */
     toArray: function () {
       var order = [],
         el,
@@ -917,10 +908,6 @@ const Sortable = (function sortableFactory() {
       return order;
     },
 
-    /**
-     * Sorts the elements according to the array.
-     * @param  {String[]}  order  order of the items
-     */
     sort: function (order) {
       var items = {}, rootEl = this.el;
 
@@ -940,30 +927,15 @@ const Sortable = (function sortableFactory() {
       });
     },
 
-    /**
-     * Save the current sorting
-     */
     save: function () {
       var store = this.options.store;
       store && store.set(this);
     },
 
-    /**
-     * For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.
-     * @param   {HTMLElement}  el
-     * @param   {String}       [selector]  default: `options.draggable`
-     * @returns {HTMLElement|null}
-     */
     closest: function (el, selector) {
       return _closest(el, selector || this.options.draggable, this.el);
     },
 
-    /**
-     * Set/get option
-     * @param   {string} name
-     * @param   {*}      [value]
-     * @returns {*}
-     */
     option: function (name, value) {
       var options = this.options;
 
@@ -978,9 +950,6 @@ const Sortable = (function sortableFactory() {
       }
     },
 
-    /**
-     * Destroy
-     */
     destroy: function () {
       var el = this.el;
 
@@ -1008,7 +977,7 @@ const Sortable = (function sortableFactory() {
     }
   };
 
-  function _globalDragOver(/**Event*/evt) {
+  function _globalDragOver(evt) {
     if (evt.dataTransfer) {
       evt.dataTransfer.dropEffect = 'move';
     }
@@ -1047,7 +1016,6 @@ const Sortable = (function sortableFactory() {
     el.draggable = false;
   }
 
-  /** @returns {HTMLElement|false} */
   function _ghostIsLast(el, evt) {
     var lastEl = el.lastElementChild,
       rect = lastEl.getBoundingClientRect();
@@ -1058,12 +1026,6 @@ const Sortable = (function sortableFactory() {
       (evt.clientX - (rect.left + rect.width) > 5);
   }
 
-  /**
-   * Generate id
-   * @param   {HTMLElement} el
-   * @returns {String}
-   * @private
-   */
   function _generateId(el) {
     var str = el.tagName + el.className + el.src + el.href + el.textContent,
       i = str.length,
@@ -1076,13 +1038,6 @@ const Sortable = (function sortableFactory() {
     return sum.toString(36);
   }
 
-  /**
-   * Returns the index of an element within its parent for a selected set of
-   * elements
-   * @param  {HTMLElement} el
-   * @param  {selector} selector
-   * @return {number}
-   */
   function _index(el, selector) {
     var index = 0;
 
@@ -1145,11 +1100,6 @@ const Sortable = (function sortableFactory() {
     cancelNextTick: _cancelNextTick
   };
 
-  /**
-   * Create sortable instance
-   * @param {HTMLElement}  el
-   * @param {Object}      [options]
-   */
   Sortable.create = function (el, options) {
     return new Sortable(el, options);
   };
