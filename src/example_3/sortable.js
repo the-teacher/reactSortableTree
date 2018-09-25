@@ -100,7 +100,7 @@ const Sortable = (function () {
 
   detectSupportActiveMode()
 
-  function Sortable(el, options) {
+  function initialize(el, options) {
     htmlElementIsRequired(el)
 
     // Implementation functions
@@ -1014,9 +1014,9 @@ const Sortable = (function () {
     }
   });
 
-  // Export
-  Sortable.version = '1.7.0';
-  return Sortable;
+  return initialize;
 })()
+
+Sortable.version = '1.7.1'
 
 export default Sortable
