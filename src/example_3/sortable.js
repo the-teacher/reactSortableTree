@@ -104,6 +104,7 @@ const Sortable = (function () {
     htmlElementIsRequired(el)
 
     this._prepareDragStart = function (e, touch, target, startIndex) {
+      console.log(1)
       var _this = this,
         el = _this.el,
         options = _this.options,
@@ -250,6 +251,81 @@ const Sortable = (function () {
         this._disableDelayedDrag();
       }
     }
+    this._disableDelayedDrag = function () {
+      var ownerDocument = this.el.ownerDocument;
+
+      clearTimeout(this._dragStartTimer);
+      _off(ownerDocument, 'mouseup', this._disableDelayedDrag);
+      _off(ownerDocument, 'touchend', this._disableDelayedDrag);
+      _off(ownerDocument, 'touchcancel', this._disableDelayedDrag);
+      _off(ownerDocument, 'mousemove', this._disableDelayedDrag);
+      _off(ownerDocument, 'touchmove', this._disableDelayedDrag);
+      _off(ownerDocument, 'pointermove', this._disableDelayedDrag);
+    }
+    this._dragStarted = function () {
+      if (rootEl && dragEl) {
+        var options = this.options;
+
+        // Apply effect
+        _toggleClass(dragEl, options.ghostClass, true);
+        _toggleClass(dragEl, options.dragClass, false);
+
+        Sortable.active = this;
+
+        // Drag start event
+        _dispatchEvent(this, rootEl, cloneEl, 'start', dragEl, rootEl, rootEl, oldIndex);
+      } else {
+        this._nulling();
+      }
+    }
+    this._emulateDragOver = function () {
+      if (touchEvt) {
+        if (this._lastX === touchEvt.clientX && this._lastY === touchEvt.clientY) {
+          return;
+        }
+
+        this._lastX = touchEvt.clientX;
+        this._lastY = touchEvt.clientY;
+
+        if (!supportCssPointerEvents) {
+          _css(ghostEl, 'display', 'none');
+        }
+
+        var target = doc.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
+        var parent = target;
+        var i = touchDragOverListeners.length;
+
+        while (target && target.shadowRoot) {
+          target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
+          parent = target;
+        }
+
+        if (parent) {
+          do {
+            if (parent.sortableInstance) {
+              while (i--) {
+                touchDragOverListeners[i]({
+                  clientX: touchEvt.clientX,
+                  clientY: touchEvt.clientY,
+                  target: target,
+                  rootEl: parent
+                });
+              }
+
+              break;
+            }
+
+            target = parent; // store last element
+          }
+          /* jshint boss:true */
+          while (parent = parent.parentNode);
+        }
+
+        if (!supportCssPointerEvents) {
+          _css(ghostEl, 'display', '');
+        }
+      }
+    }
 
     // root element
     this.el = el;
@@ -329,84 +405,6 @@ const Sortable = (function () {
 
   Sortable.prototype = {
     constructor: Sortable,
-
-    _disableDelayedDrag: function () {
-      var ownerDocument = this.el.ownerDocument;
-
-      clearTimeout(this._dragStartTimer);
-      _off(ownerDocument, 'mouseup', this._disableDelayedDrag);
-      _off(ownerDocument, 'touchend', this._disableDelayedDrag);
-      _off(ownerDocument, 'touchcancel', this._disableDelayedDrag);
-      _off(ownerDocument, 'mousemove', this._disableDelayedDrag);
-      _off(ownerDocument, 'touchmove', this._disableDelayedDrag);
-      _off(ownerDocument, 'pointermove', this._disableDelayedDrag);
-    },
-
-    _dragStarted: function () {
-      if (rootEl && dragEl) {
-        var options = this.options;
-
-        // Apply effect
-        _toggleClass(dragEl, options.ghostClass, true);
-        _toggleClass(dragEl, options.dragClass, false);
-
-        Sortable.active = this;
-
-        // Drag start event
-        _dispatchEvent(this, rootEl, cloneEl, 'start', dragEl, rootEl, rootEl, oldIndex);
-      } else {
-        this._nulling();
-      }
-    },
-
-    _emulateDragOver: function () {
-      if (touchEvt) {
-        if (this._lastX === touchEvt.clientX && this._lastY === touchEvt.clientY) {
-          return;
-        }
-
-        this._lastX = touchEvt.clientX;
-        this._lastY = touchEvt.clientY;
-
-        if (!supportCssPointerEvents) {
-          _css(ghostEl, 'display', 'none');
-        }
-
-        var target = doc.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
-        var parent = target;
-        var i = touchDragOverListeners.length;
-
-        while (target && target.shadowRoot) {
-          target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
-          parent = target;
-        }
-
-        if (parent) {
-          do {
-            if (parent.sortableInstance) {
-              while (i--) {
-                touchDragOverListeners[i]({
-                  clientX: touchEvt.clientX,
-                  clientY: touchEvt.clientY,
-                  target: target,
-                  rootEl: parent
-                });
-              }
-
-              break;
-            }
-
-            target = parent; // store last element
-          }
-          /* jshint boss:true */
-          while (parent = parent.parentNode);
-        }
-
-        if (!supportCssPointerEvents) {
-          _css(ghostEl, 'display', '');
-        }
-      }
-    },
 
     _onTouchMove: function (e) {
       if (tapEvt) {
