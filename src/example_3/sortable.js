@@ -1014,10 +1014,6 @@ const Sortable = (function () {
     }
   });
 
-  Sortable.create = function (el, options) {
-    return new Sortable(el, options)
-  }
-
   // Export
   Sortable.version = '1.7.0';
   return Sortable;

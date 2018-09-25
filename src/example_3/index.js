@@ -4,7 +4,7 @@ import { getById } from '../shared/helpers'
 
 // Simple 1
 
-Sortable.create(getById('sortable-1'), {
+new Sortable(getById('sortable-1'), {
   handle: '.drag-handle',
   animation: 150
 })
@@ -26,7 +26,7 @@ const array = [{
 }]
 
 array.forEach(function (groupOpts, i) {
-  Sortable.create(getById('advanced-' + (i + 1)), {
+  new Sortable(getById('advanced-' + (i + 1)), {
     sort: (i != 1),
     group: groupOpts,
     animation: 150
