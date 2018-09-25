@@ -32,7 +32,11 @@ import {
   _extend,
   _autoScroll,
   _prepareGroup,
-  supportCssPointerEvents
+  supportCssPointerEvents,
+  _nextTick,
+  _cancelNextTick,
+  _generateId,
+  _index
 } from './helpers/utils'
 
 import {
@@ -1026,34 +1030,6 @@ const Sortable = (function sortableFactory() {
       (e.clientX - (rect.left + rect.width) > 5);
   }
 
-  function _generateId(el) {
-    var str = el.tagName + el.className + el.src + el.href + el.textContent,
-      i = str.length,
-      sum = 0;
-
-    while (i--) {
-      sum += str.charCodeAt(i);
-    }
-
-    return sum.toString(36);
-  }
-
-  function _index(el, selector) {
-    var index = 0;
-
-    if (!el || !el.parentNode) {
-      return -1;
-    }
-
-    while (el && (el = el.previousElementSibling)) {
-      if ((el.nodeName.toUpperCase() !== 'TEMPLATE') && (selector === '>*' || _matches(el, selector))) {
-        index++;
-      }
-    }
-
-    return index;
-  }
-
   function _saveInputCheckedState(root) {
     savedInputChecked.length = 0;
 
@@ -1064,14 +1040,6 @@ const Sortable = (function sortableFactory() {
       var el = inputs[idx];
       el.checked && savedInputChecked.push(el);
     }
-  }
-
-  function _nextTick(fn) {
-    return setTimeout(fn, 0);
-  }
-
-  function _cancelNextTick(id) {
-    return clearTimeout(id);
   }
 
   // Fixed #973:

@@ -233,6 +233,42 @@ const supportCssPointerEvents = (function (el) {
   return el.style.pointerEvents === 'auto';
 })()
 
+function _nextTick(fn) {
+  return setTimeout(fn, 0)
+}
+
+function _cancelNextTick(id) {
+  return clearTimeout(id)
+}
+
+function _generateId(el) {
+  var str = el.tagName + el.className + el.src + el.href + el.textContent,
+    i = str.length,
+    sum = 0;
+
+  while (i--) {
+    sum += str.charCodeAt(i);
+  }
+
+  return sum.toString(36);
+}
+
+function _index(el, selector) {
+  var index = 0;
+
+  if (!el || !el.parentNode) {
+    return -1;
+  }
+
+  while (el && (el = el.previousElementSibling)) {
+    if ((el.nodeName.toUpperCase() !== 'TEMPLATE') && (selector === '>*' || _matches(el, selector))) {
+      index++;
+    }
+  }
+
+  return index;
+}
+
 export {
   _cloneHide,
   _closest,
@@ -242,5 +278,9 @@ export {
   _extend,
   _autoScroll,
   _prepareGroup,
-  supportCssPointerEvents
+  supportCssPointerEvents,
+  _nextTick,
+  _cancelNextTick,
+  _generateId,
+  _index
 }
