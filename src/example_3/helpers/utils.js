@@ -94,10 +94,10 @@ function _extend(dst, src) {
   return dst;
 }
 
-const _autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl, expando, scrollParentEl, autoScroll) {
+const _autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl, scrollParentEl, autoScroll) {
   // Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
   if (rootEl && options.scroll) {
-    var _this = rootEl[expando],
+    var _this = rootEl.sortableInstance,
       el,
       rect,
       sens = options.scrollSensitivity,

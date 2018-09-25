@@ -54,8 +54,6 @@ import {
 const Sortable = (function sortableFactory() {
   'use strict';
 
-  const expando = 'Sortable' + (new Date).getTime()
-
   raiseExceptionIfNotBrowserEnvironment()
 
   var dragEl,
@@ -108,7 +106,7 @@ const Sortable = (function sortableFactory() {
     this.options = options = _extend({}, options);
 
     // Export instance
-    el[expando] = this;
+    el.sortableInstance = this;
 
     // Default options
     var defaults = {
@@ -229,7 +227,7 @@ const Sortable = (function sortableFactory() {
       // Check filter
       if (typeof filter === 'function') {
         if (filter.call(this, evt, target, this)) {
-          _dispatchEvent(_this, originalTarget, cloneEl, expando, 'filter', target, el, el, startIndex);
+          _dispatchEvent(_this, originalTarget, cloneEl, 'filter', target, el, el, startIndex);
           preventOnFilter && evt.preventDefault();
           return; // cancel dnd
         }
@@ -239,7 +237,7 @@ const Sortable = (function sortableFactory() {
           criteria = _closest(originalTarget, criteria.trim(), el);
 
           if (criteria) {
-            _dispatchEvent(_this, criteria, cloneEl, expando, 'filter', target, el, el, startIndex);
+            _dispatchEvent(_this, criteria, cloneEl, 'filter', target, el, el, startIndex);
             return true;
           }
         });
@@ -296,7 +294,7 @@ const Sortable = (function sortableFactory() {
           _triggerDragStart.bind(_this)(evt, touch, rootEl, dragEl);
 
           // Drag start event
-          _dispatchEvent(_this, rootEl, cloneEl, expando, 'choose', dragEl, rootEl, rootEl, oldIndex);
+          _dispatchEvent(_this, rootEl, cloneEl, 'choose', dragEl, rootEl, rootEl, oldIndex);
         };
 
         // Disable "draggable"
@@ -359,7 +357,7 @@ const Sortable = (function sortableFactory() {
         Sortable.active = this;
 
         // Drag start event
-        _dispatchEvent(this, rootEl, cloneEl, expando, 'start', dragEl, rootEl, rootEl, oldIndex);
+        _dispatchEvent(this, rootEl, cloneEl, 'start', dragEl, rootEl, rootEl, oldIndex);
       } else {
         this._nulling();
       }
@@ -389,7 +387,7 @@ const Sortable = (function sortableFactory() {
 
         if (parent) {
           do {
-            if (parent[expando]) {
+            if (parent.sortableInstance) {
               while (i--) {
                 touchDragOverListeners[i]({
                   clientX: touchEvt.clientX,
@@ -500,7 +498,7 @@ const Sortable = (function sortableFactory() {
         // #1143: IFrame support workaround
         _this._cloneId = _nextTick(function () {
           rootEl.insertBefore(cloneEl, dragEl);
-          _dispatchEvent(_this, rootEl, cloneEl, expando, 'clone', dragEl)
+          _dispatchEvent(_this, rootEl, cloneEl, 'clone', dragEl)
         })
       }
 
@@ -580,7 +578,7 @@ const Sortable = (function sortableFactory() {
         (evt.rootEl === void 0 || evt.rootEl === this.el) // touch fallback
       ) {
         // Smart auto-scrolling
-        _autoScroll(evt, options, this.el, expando, scrollParentEl, autoScroll);
+        _autoScroll(evt, options, this.el, scrollParentEl, autoScroll);
 
         if (_silent) {
           return;
@@ -637,7 +635,7 @@ const Sortable = (function sortableFactory() {
             target && this._animate(targetRect, target);
           }
         }
-        else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0)) {
+        else if (target && !target.animated && target !== dragEl && (target.parentNode.sortableInstance !== void 0)) {
           if (lastEl !== target) {
             lastEl = target;
             lastCSS = _css(target);
@@ -793,21 +791,21 @@ const Sortable = (function sortableFactory() {
           _toggleClass(dragEl, this.options.chosenClass, false);
 
           // Drag stop event
-          _dispatchEvent(this, rootEl, cloneEl, expando, 'unchoose', dragEl, parentEl, rootEl, oldIndex, null, evt);
+          _dispatchEvent(this, rootEl, cloneEl, 'unchoose', dragEl, parentEl, rootEl, oldIndex, null, evt);
 
           if (rootEl !== parentEl) {
             newIndex = _index(dragEl, options.draggable);
 
             if (newIndex >= 0) {
               // Add event
-              _dispatchEvent(null, parentEl, cloneEl, expando, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+              _dispatchEvent(null, parentEl, cloneEl, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 
               // Remove event
-              _dispatchEvent(this, rootEl, cloneEl, expando, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+              _dispatchEvent(this, rootEl, cloneEl, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 
               // drag from one list and drop into another
-              _dispatchEvent(null, parentEl, cloneEl, expando, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
-              _dispatchEvent(this, rootEl, cloneEl, expando, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+              _dispatchEvent(null, parentEl, cloneEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+              _dispatchEvent(this, rootEl, cloneEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
             }
           }
           else {
@@ -817,8 +815,8 @@ const Sortable = (function sortableFactory() {
 
               if (newIndex >= 0) {
                 // drag & drop within the same list
-                _dispatchEvent(this, rootEl, cloneEl, expando, 'update', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
-                _dispatchEvent(this, rootEl, cloneEl, expando, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+                _dispatchEvent(this, rootEl, cloneEl, 'update', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+                _dispatchEvent(this, rootEl, cloneEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
               }
             }
           }
@@ -829,7 +827,7 @@ const Sortable = (function sortableFactory() {
               newIndex = oldIndex;
             }
 
-            _dispatchEvent(this, rootEl, cloneEl, expando, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+            _dispatchEvent(this, rootEl, cloneEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 
             // Save sorting
             this.save();
@@ -986,7 +984,7 @@ const Sortable = (function sortableFactory() {
     destroy: function () {
       var el = this.el;
 
-      el[expando] = null;
+      el.sortableInstance = null;
 
       _off(el, 'mousedown', this._onTapStart);
       _off(el, 'touchstart', this._onTapStart);
@@ -1019,7 +1017,7 @@ const Sortable = (function sortableFactory() {
 
   function _onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvt, willInsertAfter) {
     var evt,
-      sortable = fromEl[expando],
+      sortable = fromEl.sortableInstance,
       onMoveFn = sortable.options.onMove,
       retVal;
 
