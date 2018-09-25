@@ -1082,23 +1082,24 @@ const Sortable = (function sortableFactory() {
   });
 
   // Export utils
-  Sortable.utils = {
-    on: _on,
-    off: _off,
-    css: _css,
-    find: _find,
-    is: function (el, selector) {
-      return !!_closest(el, selector, el);
-    },
-    extend: _extend,
-    throttle: _throttle,
-    closest: _closest,
-    toggleClass: _toggleClass,
-    clone: clone,
-    index: _index,
-    nextTick: _nextTick,
-    cancelNextTick: _cancelNextTick
-  };
+  //
+  // Sortable.utils = {
+  //   on: _on,
+  //   off: _off,
+  //   css: _css,
+  //   find: _find,
+  //   is: function (el, selector) {
+  //     return !!_closest(el, selector, el);
+  //   },
+  //   extend: _extend,
+  //   throttle: _throttle,
+  //   closest: _closest,
+  //   toggleClass: _toggleClass,
+  //   clone: clone,
+  //   index: _index,
+  //   nextTick: _nextTick,
+  //   cancelNextTick: _cancelNextTick
+  // };
 
   Sortable.create = function (el, options) {
     return new Sortable(el, options);
