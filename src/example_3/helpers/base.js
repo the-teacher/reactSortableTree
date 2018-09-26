@@ -15,7 +15,7 @@ const detectSupportActiveMode = () => {
           passive: passiveMode
         };
       }
-    }));
+    }))
   } catch (err) {}
 }
 

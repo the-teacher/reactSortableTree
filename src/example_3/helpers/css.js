@@ -3,11 +3,11 @@ import { doc } from './base'
 function _toggleClass(el, name, state) {
   if (el) {
     if (el.classList) {
-      el.classList[state ? 'add' : 'remove'](name);
+      el.classList[state ? 'add' : 'remove'](name)
     }
     else {
-      var className = (' ' + el.className + ' ').replace(R_SPACE, ' ').replace(' ' + name + ' ', ' ');
-      el.className = (className + (state ? ' ' + name : '')).replace(R_SPACE, ' ');
+      var className = (' ' + el.className + ' ').replace(R_SPACE, ' ').replace(' ' + name + ' ', ' ')
+      el.className = (className + (state ? ' ' + name : '')).replace(R_SPACE, ' ')
     }
   }
 }
@@ -18,7 +18,7 @@ function _css(el, prop, val) {
   if (style) {
     if (val === void 0) {
       if (doc.defaultView && doc.defaultView.getComputedStyle) {
-        val = doc.defaultView.getComputedStyle(el, '');
+        val = doc.defaultView.getComputedStyle(el, '')
       }
       else if (el.currentStyle) {
         val = el.currentStyle;
@@ -31,7 +31,7 @@ function _css(el, prop, val) {
         prop = '-webkit-' + prop;
       }
 
-      style[prop] = val + (typeof val === 'string' ? '' : 'px');
+      style[prop] = val + (typeof val === 'string' ? '' : 'px')
     }
   }
 }
@@ -42,7 +42,7 @@ function _find(ctx, tagName, iterator) {
 
     if (iterator) {
       for (; i < n; i++) {
-        iterator(list[i], i);
+        iterator(list[i], i)
       }
     }
 
