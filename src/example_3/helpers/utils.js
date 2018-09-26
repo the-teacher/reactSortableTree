@@ -7,15 +7,15 @@ function _cloneHide(sortable, rootEl, cloneEl, dragEl, state) {
   }
 
   if (cloneEl && (cloneEl.state !== state)) {
-    _css(cloneEl, 'display', state ? 'none' : '');
+    _css(cloneEl, 'display', state ? 'none' : '')
 
     if (!state) {
       if (cloneEl.state) {
         if (sortable.options.group.revertClone) {
-          rootEl.insertBefore(cloneEl, nextEl);
-          sortable._animate(dragEl, cloneEl);
+          rootEl.insertBefore(cloneEl, nextEl)
+          sortable._animate(dragEl, cloneEl)
         } else {
-          rootEl.insertBefore(cloneEl, dragEl);
+          rootEl.insertBefore(cloneEl, dragEl)
         }
       }
     }
@@ -33,7 +33,7 @@ function _closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx) 
         return el;
       }
       /* jshint boss:true */
-    } while (el = _getParentOrHost(el));
+    } while (el = _getParentOrHost(el))
   }
 
   return null;
@@ -49,9 +49,9 @@ function _matches(/**HTMLElement*/el, /**String*/selector) {
   if (el) {
     try {
       if (el.matches) {
-        return el.matches(selector);
+        return el.matches(selector)
       } else if (el.msMatchesSelector) {
-        return el.msMatchesSelector(selector);
+        return el.msMatchesSelector(selector)
       }
     } catch(_) {
       return false;
@@ -71,13 +71,13 @@ function _throttle(callback, ms) {
 
       setTimeout(function () {
         if (args.length === 1) {
-          callback.call(_this, args[0]);
+          callback.call(_this, args[0])
         } else {
-          callback.apply(_this, args);
+          callback.apply(_this, args)
         }
 
         args = void 0;
-      }, ms);
+      }, ms)
     }
   };
 }
@@ -132,24 +132,24 @@ const _autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HT
             break;
           }
           /* jshint boss:true */
-        } while (scrollEl = scrollEl.parentNode);
+        } while (scrollEl = scrollEl.parentNode)
       }
     }
 
     if (scrollEl) {
       el = scrollEl;
-      rect = scrollEl.getBoundingClientRect();
-      vx = (abs(rect.right - x) <= sens) - (abs(rect.left - x) <= sens);
-      vy = (abs(rect.bottom - y) <= sens) - (abs(rect.top - y) <= sens);
+      rect = scrollEl.getBoundingClientRect()
+      vx = (abs(rect.right - x) <= sens) - (abs(rect.left - x) <= sens)
+      vy = (abs(rect.bottom - y) <= sens) - (abs(rect.top - y) <= sens)
     }
 
 
     if (!(vx || vy)) {
-      vx = (winWidth - x <= sens) - (x <= sens);
-      vy = (winHeight - y <= sens) - (y <= sens);
+      vx = (winWidth - x <= sens) - (x <= sens)
+      vy = (winHeight - y <= sens) - (y <= sens)
 
       /* jshint expr:true */
-      (vx || vy) && (el = win);
+      (vx || vy) && (el = win)
     }
 
 
@@ -158,7 +158,7 @@ const _autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HT
       autoScroll.vx = vx;
       autoScroll.vy = vy;
 
-      clearInterval(autoScroll.pid);
+      clearInterval(autoScroll.pid)
 
       if (el) {
         autoScroll.pid = setInterval(function () {
@@ -172,12 +172,12 @@ const _autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HT
           }
 
           if (el === win) {
-            win.scrollTo(win.pageXOffset + scrollOffsetX, win.pageYOffset + scrollOffsetY);
+            win.scrollTo(win.pageXOffset + scrollOffsetX, win.pageYOffset + scrollOffsetY)
           } else {
             el.scrollTop += scrollOffsetY;
             el.scrollLeft += scrollOffsetX;
           }
-        }, 24);
+        }, 24)
       }
     }
   }
@@ -203,7 +203,7 @@ const _prepareGroup = function (options) {
           : value && (value.join
             ? value.indexOf(fromGroup) > -1
             : (fromGroup == value)
-          );
+          )
       };
     }
   }
@@ -216,8 +216,8 @@ const _prepareGroup = function (options) {
   }
 
   group.name = originalGroup.name;
-  group.checkPull = toFn(originalGroup.pull, true);
-  group.checkPut = toFn(originalGroup.put);
+  group.checkPull = toFn(originalGroup.pull, true)
+  group.checkPut = toFn(originalGroup.put)
   group.revertClone = originalGroup.revertClone;
 
   options.group = group;
@@ -247,10 +247,10 @@ function _generateId(el) {
     sum = 0;
 
   while (i--) {
-    sum += str.charCodeAt(i);
+    sum += str.charCodeAt(i)
   }
 
-  return sum.toString(36);
+  return sum.toString(36)
 }
 
 function _index(el, selector) {
@@ -273,7 +273,7 @@ function _globalDragOver(e) {
   if (e.dataTransfer) {
     e.dataTransfer.dropEffect = 'move';
   }
-  e.preventDefault();
+  e.preventDefault()
 }
 
 function _disableDraggable(el) {
