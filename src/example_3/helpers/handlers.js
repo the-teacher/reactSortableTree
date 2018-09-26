@@ -2,7 +2,7 @@ import { win, doc } from './base'
 import { _on } from './events'
 
 const _triggerDragStart = function (/** Event */evt, /** Touch */touch, rootEl, dragEl) {
-  touch = touch || (evt.pointerType == 'touch' ? evt : null);
+  touch = touch || (evt.pointerType == 'touch' ? evt : null)
 
   if (touch) {
     // Touch device support
@@ -12,24 +12,24 @@ const _triggerDragStart = function (/** Event */evt, /** Touch */touch, rootEl, 
       clientY: touch.clientY
     };
 
-    this._onDragStart(tapEvt, 'touch');
+    this._onDragStart(tapEvt, 'touch')
   }
   else if (!this.nativeDraggable) {
-    this._onDragStart(tapEvt, true);
+    this._onDragStart(tapEvt, true)
   }
   else {
-    _on(dragEl, 'dragend', this);
-    _on(rootEl, 'dragstart', this._onDragStart);
+    _on(dragEl, 'dragend', this)
+    _on(rootEl, 'dragstart', this._onDragStart)
   }
 
   try {
     if (doc.selection) {
       // Timeout neccessary for IE9
       _nextTick(function () {
-        doc.selection.empty();
-      });
+        doc.selection.empty()
+      })
     } else {
-      win.getSelection().removeAllRanges();
+      win.getSelection().removeAllRanges()
     }
   } catch (err) {
   }
