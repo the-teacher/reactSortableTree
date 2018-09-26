@@ -99,12 +99,8 @@ const Sortable = (function () {
     touchDragOverListeners = []
   ;
 
-  detectSupportActiveMode()
-
-  function initialize(el, options) {
-    htmlElementIsRequired(el)
-
-    // Implementation functions
+  // Implementation functions
+  function _defineImplementationMethods () {
     this._prepareDragStart = function (e, touch, target, startIndex) {
       var _this = this,
         el = _this.el,
@@ -927,6 +923,13 @@ const Sortable = (function () {
         el.checked && savedInputChecked.push(el);
       }
     }
+  }
+
+  detectSupportActiveMode()
+
+  function initialize(el, options) {
+    htmlElementIsRequired(el)
+    _defineImplementationMethods.bind(this)()
 
     // Root element
     this.el = el;
