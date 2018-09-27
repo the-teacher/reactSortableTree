@@ -101,6 +101,31 @@ const Sortable = (function () {
 
   // Implementation functions
   function _defineImplementationMethods () {
+    this.handleEvent = function (e) {
+      switch (e.type) {
+        case 'drop':
+        case 'dragend':
+          this._onDrop(e)
+          break;
+
+        case 'dragover':
+        case 'dragenter':
+          if (dragEl) {
+            this._onDragOver(e)
+            _globalDragOver(e)
+          }
+          break;
+
+        case 'mouseover':
+          this._onDrop(e)
+          break;
+
+        case 'selectstart':
+          e.preventDefault()
+          break;
+      }
+    }
+
     this._prepareDragStart = function (e, touch, target, startIndex) {
       var _this = this,
         el = _this.el,
@@ -358,36 +383,7 @@ const Sortable = (function () {
         e.preventDefault()
       }
     }
-    this._appendGhost =  function () {
-      if (!ghostEl) {
-        var rect = dragEl.getBoundingClientRect(),
-          css = _css(dragEl),
-          options = this.options,
-          ghostRect;
 
-        ghostEl = dragEl.cloneNode(true)
-
-        _toggleClass(ghostEl, options.ghostClass, false)
-        _toggleClass(ghostEl, options.fallbackClass, true)
-        _toggleClass(ghostEl, options.dragClass, true)
-
-        _css(ghostEl, 'top', rect.top - toInt(css.marginTop))
-        _css(ghostEl, 'left', rect.left - toInt(css.marginLeft))
-        _css(ghostEl, 'width', rect.width)
-        _css(ghostEl, 'height', rect.height)
-        _css(ghostEl, 'opacity', '0.8')
-        _css(ghostEl, 'position', 'fixed')
-        _css(ghostEl, 'zIndex', '100000')
-        _css(ghostEl, 'pointerEvents', 'none')
-
-        options.fallbackOnBody && doc.body.appendChild(ghostEl) || rootEl.appendChild(ghostEl)
-
-        // Fixing dimensions.
-        ghostRect = ghostEl.getBoundingClientRect()
-        _css(ghostEl, 'width', rect.width * 2 - ghostRect.width)
-        _css(ghostEl, 'height', rect.height * 2 - ghostRect.height)
-      }
-    }
     this._onDragStart =  function (e, useFallback) {
       var _this = this
       var dataTransfer = e.dataTransfer
@@ -447,6 +443,33 @@ const Sortable = (function () {
 
         _this._dragStartId = _nextTick(_this._dragStarted)
       }
+    }
+    this._onMove = function (fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvt, willInsertAfter) {
+      var e,
+        sortable = fromEl.sortableInstance,
+        onMoveFn = sortable.options.onMove,
+        retVal;
+
+      e = doc.createEvent('Event')
+      e.initEvent('move', true, true)
+
+      e.to = toEl;
+      e.from = fromEl;
+      e.dragged = dragEl;
+      e.draggedRect = dragRect;
+      e.related = targetEl || toEl;
+      e.relatedRect = targetRect || toEl.getBoundingClientRect()
+      e.willInsertAfter = willInsertAfter;
+
+      e.originalEvent = originalEvt;
+
+      fromEl.dispatchEvent(e)
+
+      if (onMoveFn) {
+        retVal = onMoveFn.call(sortable, e, originalEvt)
+      }
+
+      return retVal;
     }
     this._onDragOver =  function (e) {
       var el = this.el,
@@ -606,47 +629,6 @@ const Sortable = (function () {
         }
       }
     }
-    this._animate = function (prevRect, target) {
-      var ms = this.options.animation;
-
-      if (ms) {
-        var currentRect = target.getBoundingClientRect()
-
-        if (prevRect.nodeType === 1) {
-          prevRect = prevRect.getBoundingClientRect()
-        }
-
-        _css(target, 'transition', 'none')
-        _css(target, 'transform', 'translate3d('
-          + (prevRect.left - currentRect.left) + 'px,'
-          + (prevRect.top - currentRect.top) + 'px,0)'
-        )
-
-        forRepaintDummy = target.offsetWidth; // repaint
-
-        _css(target, 'transition', 'all ' + ms + 'ms')
-        _css(target, 'transform', 'translate3d(0,0,0)')
-
-        clearTimeout(target.animated)
-        target.animated = setTimeout(function () {
-          _css(target, 'transition', '')
-          _css(target, 'transform', '')
-          target.animated = false;
-        }, ms)
-      }
-    }
-    this._offUpEvents = function () {
-      var ownerDocument = this.el.ownerDocument;
-
-      _off(doc, 'touchmove', this._onTouchMove)
-      _off(doc, 'pointermove', this._onTouchMove)
-      _off(ownerDocument, 'mouseup', this._onDrop)
-      _off(ownerDocument, 'touchend', this._onDrop)
-      _off(ownerDocument, 'pointerup', this._onDrop)
-      _off(ownerDocument, 'touchcancel', this._onDrop)
-      _off(ownerDocument, 'pointercancel', this._onDrop)
-      _off(ownerDocument, 'selectstart', this)
-    }
     this._onDrop = function (e) {
       var el = this.el,
         options = this.options;
@@ -772,69 +754,89 @@ const Sortable = (function () {
       })
       savedInputChecked.length = 0;
     }
-    this.handleEvent = function (e) {
-      switch (e.type) {
-        case 'drop':
-        case 'dragend':
-          this._onDrop(e)
-          break;
 
-        case 'dragover':
-        case 'dragenter':
-          if (dragEl) {
-            this._onDragOver(e)
-            _globalDragOver(e)
-          }
-          break;
+    this._appendGhost =  function () {
+      if (!ghostEl) {
+        var rect = dragEl.getBoundingClientRect(),
+          css = _css(dragEl),
+          options = this.options,
+          ghostRect;
 
-        case 'mouseover':
-          this._onDrop(e)
-          break;
+        ghostEl = dragEl.cloneNode(true)
 
-        case 'selectstart':
-          e.preventDefault()
-          break;
+        _toggleClass(ghostEl, options.ghostClass, false)
+        _toggleClass(ghostEl, options.fallbackClass, true)
+        _toggleClass(ghostEl, options.dragClass, true)
+
+        _css(ghostEl, 'top', rect.top - toInt(css.marginTop))
+        _css(ghostEl, 'left', rect.left - toInt(css.marginLeft))
+        _css(ghostEl, 'width', rect.width)
+        _css(ghostEl, 'height', rect.height)
+        _css(ghostEl, 'opacity', '0.8')
+        _css(ghostEl, 'position', 'fixed')
+        _css(ghostEl, 'zIndex', '100000')
+        _css(ghostEl, 'pointerEvents', 'none')
+
+        options.fallbackOnBody && doc.body.appendChild(ghostEl) || rootEl.appendChild(ghostEl)
+
+        // Fixing dimensions.
+        ghostRect = ghostEl.getBoundingClientRect()
+        _css(ghostEl, 'width', rect.width * 2 - ghostRect.width)
+        _css(ghostEl, 'height', rect.height * 2 - ghostRect.height)
       }
     }
-    this.toArray = function () {
-      var order = [],
-        el,
-        children = this.el.children,
-        i = 0,
-        n = children.length,
-        options = this.options;
+    this._ghostIsLast = function (el, e) {
+      var lastEl = el.lastElementChild,
+        rect = lastEl.getBoundingClientRect()
 
-      for (; i < n; i++) {
-        el = children[i];
-        if (_closest(el, options.draggable, this.el)) {
-          order.push(el.getAttribute(options.dataIdAttr) || _generateId(el))
+      // 5 — min delta
+      // abs — нельзя добавлять, а то глюки при наведении сверху
+      return (e.clientY - (rect.top + rect.height) > 5) ||
+        (e.clientX - (rect.left + rect.width) > 5)
+    }
+
+    this._animate = function (prevRect, target) {
+      var ms = this.options.animation;
+
+      if (ms) {
+        var currentRect = target.getBoundingClientRect()
+
+        if (prevRect.nodeType === 1) {
+          prevRect = prevRect.getBoundingClientRect()
         }
+
+        _css(target, 'transition', 'none')
+        _css(target, 'transform', 'translate3d('
+          + (prevRect.left - currentRect.left) + 'px,'
+          + (prevRect.top - currentRect.top) + 'px,0)'
+        )
+
+        forRepaintDummy = target.offsetWidth; // repaint
+
+        _css(target, 'transition', 'all ' + ms + 'ms')
+        _css(target, 'transform', 'translate3d(0,0,0)')
+
+        clearTimeout(target.animated)
+        target.animated = setTimeout(function () {
+          _css(target, 'transition', '')
+          _css(target, 'transform', '')
+          target.animated = false;
+        }, ms)
       }
-
-      return order;
     }
-    this.sort = function (order) {
-      var items = {}, rootEl = this.el;
+    this._offUpEvents = function () {
+      var ownerDocument = this.el.ownerDocument;
 
-      this.toArray().forEach(function (id, i) {
-        var el = rootEl.children[i];
-
-        if (_closest(el, this.options.draggable, rootEl)) {
-          items[id] = el;
-        }
-      }, this)
-
-      order.forEach(function (id) {
-        if (items[id]) {
-          rootEl.removeChild(items[id])
-          rootEl.appendChild(items[id])
-        }
-      })
+      _off(doc, 'touchmove', this._onTouchMove)
+      _off(doc, 'pointermove', this._onTouchMove)
+      _off(ownerDocument, 'mouseup', this._onDrop)
+      _off(ownerDocument, 'touchend', this._onDrop)
+      _off(ownerDocument, 'pointerup', this._onDrop)
+      _off(ownerDocument, 'touchcancel', this._onDrop)
+      _off(ownerDocument, 'pointercancel', this._onDrop)
+      _off(ownerDocument, 'selectstart', this)
     }
-    this.save = function () {
-      var store = this.options.store;
-      store && store.set(this)
-    }
+
     this.closest = function (el, selector) {
       return _closest(el, selector || this.options.draggable, this.el)
     }
@@ -876,42 +878,47 @@ const Sortable = (function () {
 
       this.el = el = null;
     }
-    this._onMove = function (fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvt, willInsertAfter) {
-      var e,
-        sortable = fromEl.sortableInstance,
-        onMoveFn = sortable.options.onMove,
-        retVal;
 
-      e = doc.createEvent('Event')
-      e.initEvent('move', true, true)
+    this.toArray = function () {
+      var order = [],
+        el,
+        children = this.el.children,
+        i = 0,
+        n = children.length,
+        options = this.options;
 
-      e.to = toEl;
-      e.from = fromEl;
-      e.dragged = dragEl;
-      e.draggedRect = dragRect;
-      e.related = targetEl || toEl;
-      e.relatedRect = targetRect || toEl.getBoundingClientRect()
-      e.willInsertAfter = willInsertAfter;
-
-      e.originalEvent = originalEvt;
-
-      fromEl.dispatchEvent(e)
-
-      if (onMoveFn) {
-        retVal = onMoveFn.call(sortable, e, originalEvt)
+      for (; i < n; i++) {
+        el = children[i];
+        if (_closest(el, options.draggable, this.el)) {
+          order.push(el.getAttribute(options.dataIdAttr) || _generateId(el))
+        }
       }
 
-      return retVal;
+      return order;
     }
-    this._ghostIsLast = function (el, e) {
-      var lastEl = el.lastElementChild,
-        rect = lastEl.getBoundingClientRect()
+    this.sort = function (order) {
+      var items = {}, rootEl = this.el;
 
-      // 5 — min delta
-      // abs — нельзя добавлять, а то глюки при наведении сверху
-      return (e.clientY - (rect.top + rect.height) > 5) ||
-        (e.clientX - (rect.left + rect.width) > 5)
+      this.toArray().forEach(function (id, i) {
+        var el = rootEl.children[i];
+
+        if (_closest(el, this.options.draggable, rootEl)) {
+          items[id] = el;
+        }
+      }, this)
+
+      order.forEach(function (id) {
+        if (items[id]) {
+          rootEl.removeChild(items[id])
+          rootEl.appendChild(items[id])
+        }
+      })
     }
+    this.save = function () {
+      var store = this.options.store;
+      store && store.set(this)
+    }
+
     this._saveInputCheckedState = function (root) {
       savedInputChecked.length = 0;
 
