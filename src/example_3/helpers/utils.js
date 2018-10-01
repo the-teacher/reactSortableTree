@@ -24,16 +24,18 @@ function _cloneHide(sortable, rootEl, cloneEl, dragEl, state) {
   }
 }
 
-function _closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx) {
-  if (el) {
+// It finds a closes item to a target within a context
+// target - target item. Can be a handler item or a draggable item
+function _closest(target, selector, ctx) {
+  if (target) {
     ctx = ctx || document;
 
     do {
-      if ((selector === '>*' && el.parentNode === ctx) || _matches(el, selector)) {
-        return el;
+      if ((selector === '>*' && target.parentNode === ctx) || _matches(target, selector)) {
+        return target;
       }
       /* jshint boss:true */
-    } while (el = _getParentOrHost(el))
+    } while (target = _getParentOrHost(target))
   }
 
   return null;
@@ -45,7 +47,8 @@ function _getParentOrHost(el) {
   return (parent && parent.nodeType) ? parent : el.parentNode;
 }
 
-function _matches(/**HTMLElement*/el, /**String*/selector) {
+// Browser independent match function
+function _matches(el, selector) {
   if (el) {
     try {
       if (el.matches) {

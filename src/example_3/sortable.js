@@ -160,6 +160,7 @@ const Sortable = (function () {
     this._prepareDragStart = function (e, touch, target, startIndex) {
       // sortable root
       var el = getFirstSortableParent(e.target)
+      // target => handler item or draggable element
 
       var _this = this,
         options = _this.options,
@@ -229,18 +230,24 @@ const Sortable = (function () {
       }
     }
     this._onTapStart = function (e) {
-      // sortable root
+      var _this = this;
+
+      // Sortable root
       var el = getFirstSortableParent(e.target)
 
-      var _this = this,
-        options = this.options,
-        preventOnFilter = options.preventOnFilter,
+      // Defite a touch event
+      var touch = e.touches && e.touches[0];
+
+      // Define a target. A handler item of a draggable item
+      var target = (touch || e).target;
+      var originalTarget = e.target.shadowRoot && (e.path && e.path[0]) || target;
+
+      var
+        startIndex,
         type = e.type,
-        touch = e.touches && e.touches[0],
-        target = (touch || e).target,
-        originalTarget = e.target.shadowRoot && (e.path && e.path[0]) || target,
+        options = this.options,
         filter = options.filter,
-        startIndex;
+        preventOnFilter = options.preventOnFilter;
 
       this._saveInputCheckedState(el)
 
@@ -258,6 +265,7 @@ const Sortable = (function () {
         return;
       }
 
+      // define draggable Element
       target = _closest(target, options.draggable, el)
 
       if (!target) {
