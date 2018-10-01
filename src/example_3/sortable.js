@@ -2,6 +2,21 @@
 // * @author  RubaXa   <trash@rubaxa.org>
 // * @license MIT
 
+// _onTapStart
+// _prepareDragStart
+// _disableDelayedDrag
+// _onTapStart
+// _onDragStart
+// _offUpEvents
+// _dragStarted
+// _nulling
+// handleEvent
+// (25)handleEvent
+// _onDragOver
+// _onDrop
+// _offUpEvents
+// _nulling
+
 import {
   log
 } from '../shared/helpers'
@@ -56,6 +71,22 @@ import {
 import {
   _triggerDragStart
 } from './helpers/handlers'
+
+function getFirstSortableParent (el) {
+  if (el.sortableInstance) return el
+  var sortableParent = null
+
+  while (el) {
+    if (el.sortableInstance) {
+      sortableParent = el
+      break
+    }
+
+    el = el.parentElement
+  }
+
+  return el
+}
 
 const Sortable = (function () {
   'use strict';
@@ -127,8 +158,10 @@ const Sortable = (function () {
     }
 
     this._prepareDragStart = function (e, touch, target, startIndex) {
+      // sortable root
+      var el = getFirstSortableParent(e.target)
+
       var _this = this,
-        el = _this.el,
         options = _this.options,
         ownerDocument = el.ownerDocument,
         dragStartFn;
@@ -196,8 +229,10 @@ const Sortable = (function () {
       }
     }
     this._onTapStart = function (e) {
+      // sortable root
+      var el = getFirstSortableParent(e.target)
+
       var _this = this,
-        el = this.el,
         options = this.options,
         preventOnFilter = options.preventOnFilter,
         type = e.type,
