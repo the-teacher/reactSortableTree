@@ -3,7 +3,7 @@ import Sortable from './sortable'
 import { getById } from '../shared/helpers'
 
 // Simple 1
-console.log(Sortable.version) 
+console.log(Sortable.version)
 
 new Sortable(getById('sortable-1'), {
   handle: '.drag-handle',

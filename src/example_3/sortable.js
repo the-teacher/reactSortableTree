@@ -158,8 +158,9 @@ const Sortable = (function () {
     }
 
     this._prepareDragStart = function (e, touch, target, startIndex) {
-      // sortable root
+      // Sortable root
       var el = getFirstSortableParent(e.target)
+
       // target => handler item or draggable element
 
       var _this = this,
