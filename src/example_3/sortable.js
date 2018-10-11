@@ -143,6 +143,7 @@ const Sortable = (function () {
         case 'dragenter':
           var el = getFirstSortableParent(e.target)
           if (el.dragEl) {
+            console.log(el)
             this._onDragOver(e)
             _globalDragOver(e)
           }
@@ -434,6 +435,7 @@ const Sortable = (function () {
     }
 
     this._onDragStart =  function (e, useFallback) {
+      console.log('_onDragStart')
       var el = getFirstSortableParent(e.target)
 
       var _this = this
@@ -526,6 +528,8 @@ const Sortable = (function () {
       return retVal;
     }
     this._onDragOver =  function (e) {
+      console.log('_onDragOver')
+
       var el = this.el,
         target,
         dragRect,
