@@ -130,6 +130,11 @@ const Sortable = (function () {
     touchDragOverListeners = []
   ;
 
+  const show_vars = _throttle(function(a, b){
+    console.log(a)
+    console.log(b)
+  }, 1000)
+
   // Implementation functions
   function _defineImplementationMethods () {
     this.handleEvent = function (e) {
@@ -141,6 +146,11 @@ const Sortable = (function () {
 
         case 'dragover':
         case 'dragenter':
+
+          var parent = dragEl.parentElement
+          var child = dragEl
+          show_vars(parent, child)
+
           if (dragEl) {
             this._onDragOver(e)
             _globalDragOver(e)
