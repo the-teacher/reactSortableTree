@@ -90,7 +90,6 @@ const Sortable = (function () {
   raiseExceptionIfNotBrowserEnvironment()
 
   var
-    rootEl,
     nextEl,
     lastDownEl,
 
@@ -161,7 +160,7 @@ const Sortable = (function () {
       if (target && !Sortable.draggableItem && (target.parentNode === el)) {
         el.tapEvt = e;
 
-        rootEl = el;
+        Sortable.rootEl = el;
         Sortable.draggableItem = target;
         Sortable.parentEl = Sortable.draggableItem.parentNode;
         nextEl = Sortable.draggableItem.nextSibling;
@@ -186,10 +185,10 @@ const Sortable = (function () {
           _toggleClass(Sortable.draggableItem, options.chosenClass, true)
 
           // Bind the events: dragstart/dragend
-          _this._triggerDragStart(e, touch, rootEl, Sortable.draggableItem)
+          _this._triggerDragStart(e, touch, Sortable.rootEl, Sortable.draggableItem)
 
           // Drag start event
-          _dispatchEvent(_this, rootEl, Sortable.cloneEl, 'choose', Sortable.draggableItem, rootEl, rootEl, oldIndex)
+          _dispatchEvent(_this, Sortable.rootEl, Sortable.cloneEl, 'choose', Sortable.draggableItem, Sortable.rootEl, Sortable.rootEl, oldIndex)
         };
 
         // Disable "draggable"
@@ -321,7 +320,7 @@ const Sortable = (function () {
     this._dragStarted = function (e) {
       var el = getFirstSortableParent(e.target)
 
-      if (rootEl && Sortable.draggableItem) {
+      if (Sortable.rootEl && Sortable.draggableItem) {
         var options = this.options;
 
         // Apply effect
@@ -331,7 +330,7 @@ const Sortable = (function () {
         activeSortableItem = this;
 
         // Drag start event
-        _dispatchEvent(this, rootEl, Sortable.cloneEl, 'start', Sortable.draggableItem, rootEl, rootEl, oldIndex)
+        _dispatchEvent(this, Sortable.rootEl, Sortable.cloneEl, 'start', Sortable.draggableItem, Sortable.rootEl, Sortable.rootEl, oldIndex)
       } else {
         this._nulling(e)
       }
@@ -479,8 +478,8 @@ const Sortable = (function () {
 
         // #1143: IFrame support workaround
         _this._cloneId = _nextTick(function () {
-          rootEl.insertBefore(Sortable.cloneEl, Sortable.draggableItem)
-          _dispatchEvent(_this, rootEl, Sortable.cloneEl, 'clone', Sortable.draggableItem)
+          Sortable.rootEl.insertBefore(Sortable.cloneEl, Sortable.draggableItem)
+          _dispatchEvent(_this, Sortable.rootEl, Sortable.cloneEl, 'clone', Sortable.draggableItem)
         })
       }
 
@@ -578,7 +577,7 @@ const Sortable = (function () {
 
       if (activeSortable && !options.disabled &&
         (isOwner
-          ? canSort || (revert = !rootEl.contains(Sortable.draggableItem)) // Reverting item into the original list
+          ? canSort || (revert = !Sortable.rootEl.contains(Sortable.draggableItem)) // Reverting item into the original list
           : (
             putSortable === this ||
             (
@@ -605,14 +604,14 @@ const Sortable = (function () {
         }
 
         if (revert) {
-          _cloneHide(activeSortable, rootEl, Sortable.cloneEl, Sortable.draggableItem, true)
-          Sortable.parentEl = rootEl; // actualization
+          _cloneHide(activeSortable, Sortable.rootEl, Sortable.cloneEl, Sortable.draggableItem, true)
+          Sortable.parentEl = Sortable.rootEl; // actualization
 
           if (Sortable.cloneEl || nextEl) {
-            rootEl.insertBefore(Sortable.draggableItem, Sortable.cloneEl || nextEl)
+            Sortable.rootEl.insertBefore(Sortable.draggableItem, Sortable.cloneEl || nextEl)
           }
           else if (!canSort) {
-            rootEl.appendChild(Sortable.draggableItem)
+            Sortable.rootEl.appendChild(Sortable.draggableItem)
           }
 
           return;
@@ -634,9 +633,9 @@ const Sortable = (function () {
             targetRect = target.getBoundingClientRect()
           }
 
-          _cloneHide(activeSortable, rootEl, Sortable.cloneEl, Sortable.draggableItem, isOwner)
+          _cloneHide(activeSortable, Sortable.rootEl, Sortable.cloneEl, Sortable.draggableItem, isOwner)
 
-          if (this._onMove(rootEl, el, Sortable.draggableItem, dragRect, target, targetRect, e) !== false) {
+          if (this._onMove(Sortable.rootEl, el, Sortable.draggableItem, dragRect, target, targetRect, e) !== false) {
             if (!Sortable.draggableItem.contains(el)) {
               el.appendChild(Sortable.draggableItem)
               Sortable.parentEl = el; // actualization
@@ -682,7 +681,7 @@ const Sortable = (function () {
             after = (nextSibling !== Sortable.draggableItem) && !isLong || halfway && isLong;
           }
 
-          var moveVector = this._onMove(rootEl, el, Sortable.draggableItem, dragRect, target, targetRect, e, after)
+          var moveVector = this._onMove(Sortable.rootEl, el, Sortable.draggableItem, dragRect, target, targetRect, e, after)
 
           if (moveVector !== false) {
             if (moveVector === 1 || moveVector === -1) {
@@ -692,7 +691,7 @@ const Sortable = (function () {
             _silent = true;
             setTimeout(function () { _silent = false }, 30)
 
-            _cloneHide(activeSortable, rootEl, Sortable.cloneEl, Sortable.draggableItem, isOwner)
+            _cloneHide(activeSortable, Sortable.rootEl, Sortable.cloneEl, Sortable.draggableItem, isOwner)
 
             if (!Sortable.draggableItem.contains(el)) {
               if (after && !nextSibling) {
@@ -740,7 +739,7 @@ const Sortable = (function () {
 
         Sortable.ghostEl && Sortable.ghostEl.parentNode && Sortable.ghostEl.parentNode.removeChild(Sortable.ghostEl)
 
-        if (rootEl === Sortable.parentEl || activeSortableItem.lastPullMode !== 'clone') {
+        if (Sortable.rootEl === Sortable.parentEl || activeSortableItem.lastPullMode !== 'clone') {
           // Remove clone
           Sortable.cloneEl && Sortable.cloneEl.parentNode && Sortable.cloneEl.parentNode.removeChild(Sortable.cloneEl)
         }
@@ -758,21 +757,21 @@ const Sortable = (function () {
           _toggleClass(Sortable.draggableItem, this.options.chosenClass, false)
 
           // Drag stop event
-          _dispatchEvent(this, rootEl, Sortable.cloneEl, 'unchoose', Sortable.draggableItem, Sortable.parentEl, rootEl, oldIndex, null, e)
+          _dispatchEvent(this, Sortable.rootEl, Sortable.cloneEl, 'unchoose', Sortable.draggableItem, Sortable.parentEl, Sortable.rootEl, oldIndex, null, e)
 
-          if (rootEl !== Sortable.parentEl) {
+          if (Sortable.rootEl !== Sortable.parentEl) {
             newIndex = _index(Sortable.draggableItem, options.draggable)
 
             if (newIndex >= 0) {
               // Add event
-              _dispatchEvent(null, Sortable.parentEl, Sortable.cloneEl, 'add', Sortable.draggableItem, Sortable.parentEl, rootEl, oldIndex, newIndex, e)
+              _dispatchEvent(null, Sortable.parentEl, Sortable.cloneEl, 'add', Sortable.draggableItem, Sortable.parentEl, Sortable.rootEl, oldIndex, newIndex, e)
 
               // Remove event
-              _dispatchEvent(this, rootEl, Sortable.cloneEl, 'remove', Sortable.draggableItem, Sortable.parentEl, rootEl, oldIndex, newIndex, e)
+              _dispatchEvent(this, Sortable.rootEl, Sortable.cloneEl, 'remove', Sortable.draggableItem, Sortable.parentEl, Sortable.rootEl, oldIndex, newIndex, e)
 
               // drag from one list and drop into another
-              _dispatchEvent(null, Sortable.parentEl, Sortable.cloneEl, 'sort', Sortable.draggableItem, Sortable.parentEl, rootEl, oldIndex, newIndex, e)
-              _dispatchEvent(this, rootEl, Sortable.cloneEl, 'sort', Sortable.draggableItem, Sortable.parentEl, rootEl, oldIndex, newIndex, e)
+              _dispatchEvent(null, Sortable.parentEl, Sortable.cloneEl, 'sort', Sortable.draggableItem, Sortable.parentEl, Sortable.rootEl, oldIndex, newIndex, e)
+              _dispatchEvent(this, Sortable.rootEl, Sortable.cloneEl, 'sort', Sortable.draggableItem, Sortable.parentEl, Sortable.rootEl, oldIndex, newIndex, e)
             }
           }
           else {
@@ -782,8 +781,8 @@ const Sortable = (function () {
 
               if (newIndex >= 0) {
                 // drag & drop within the same list
-                _dispatchEvent(this, rootEl, Sortable.cloneEl, 'update', Sortable.draggableItem, Sortable.parentEl, rootEl, oldIndex, newIndex, e)
-                _dispatchEvent(this, rootEl, Sortable.cloneEl, 'sort', Sortable.draggableItem, Sortable.parentEl, rootEl, oldIndex, newIndex, e)
+                _dispatchEvent(this, Sortable.rootEl, Sortable.cloneEl, 'update', Sortable.draggableItem, Sortable.parentEl, Sortable.rootEl, oldIndex, newIndex, e)
+                _dispatchEvent(this, Sortable.rootEl, Sortable.cloneEl, 'sort', Sortable.draggableItem, Sortable.parentEl, Sortable.rootEl, oldIndex, newIndex, e)
               }
             }
           }
@@ -794,7 +793,7 @@ const Sortable = (function () {
               newIndex = oldIndex;
             }
 
-            _dispatchEvent(this, rootEl, Sortable.cloneEl, 'end', Sortable.draggableItem, Sortable.parentEl, rootEl, oldIndex, newIndex, e)
+            _dispatchEvent(this, Sortable.rootEl, Sortable.cloneEl, 'end', Sortable.draggableItem, Sortable.parentEl, Sortable.rootEl, oldIndex, newIndex, e)
 
             // Save sorting
             this.save()
@@ -807,7 +806,7 @@ const Sortable = (function () {
     this._nulling = function(e) {
       var el = getFirstSortableParent(e.target)
 
-      rootEl =
+      Sortable.rootEl =
       Sortable.draggableItem =
       Sortable.parentEl =
       Sortable.ghostEl =
@@ -858,7 +857,7 @@ const Sortable = (function () {
         _css(Sortable.ghostEl, 'zIndex', '100000')
         _css(Sortable.ghostEl, 'pointerEvents', 'none')
 
-        options.fallbackOnBody && doc.body.appendChild(Sortable.ghostEl) || rootEl.appendChild(Sortable.ghostEl)
+        options.fallbackOnBody && doc.body.appendChild(Sortable.ghostEl) || Sortable.rootEl.appendChild(Sortable.ghostEl)
 
         // Fixing dimensions.
         ghostRect = Sortable.ghostEl.getBoundingClientRect()
