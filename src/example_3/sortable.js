@@ -90,8 +90,6 @@ const Sortable = (function () {
   raiseExceptionIfNotBrowserEnvironment()
 
   var
-    lastDownEl,
-
     scrollParentEl,
     scrollCustomFn,
 
@@ -163,7 +161,7 @@ const Sortable = (function () {
         Sortable.draggableItem = target;
         Sortable.parentEl = Sortable.draggableItem.parentNode;
         Sortable.nextEl = Sortable.draggableItem.nextSibling;
-        lastDownEl = target;
+        Sortable.lastDownEl = target;
         activeGroup = options.group;
         oldIndex = startIndex;
 
@@ -261,7 +259,7 @@ const Sortable = (function () {
         return;
       }
 
-      if (lastDownEl === target) {
+      if (Sortable.lastDownEl === target) {
         // Ignoring duplicate `down`
         return;
       }
@@ -811,7 +809,7 @@ const Sortable = (function () {
       Sortable.ghostEl =
       Sortable.nextEl =
       Sortable.cloneEl =
-      lastDownEl =
+      Sortable.lastDownEl =
 
       scrollParentEl =
 
