@@ -90,9 +90,6 @@ const Sortable = (function () {
   raiseExceptionIfNotBrowserEnvironment()
 
   var
-    lastCSS,
-    lastParentCSS,
-
     oldIndex,
     newIndex,
 
@@ -641,16 +638,16 @@ const Sortable = (function () {
         else if (target && !target.animated && target !== Sortable.draggableItem && (target.parentNode.sortableInstance !== void 0)) {
           if (Sortable.lastEl !== target) {
             Sortable.lastEl = target;
-            lastCSS = _css(target)
-            lastParentCSS = _css(target.parentNode)
+            Sortable.lastCSS = _css(target)
+            Sortable.lastParentCSS = _css(target.parentNode)
           }
 
           targetRect = target.getBoundingClientRect()
 
           var width = targetRect.right - targetRect.left,
             height = targetRect.bottom - targetRect.top,
-            floating = R_FLOAT.test(lastCSS.cssFloat + lastCSS.display)
-              || (lastParentCSS.display == 'flex' && lastParentCSS['flex-direction'].indexOf('row') === 0),
+            floating = R_FLOAT.test(Sortable.lastCSS.cssFloat + Sortable.lastCSS.display)
+              || (Sortable.lastParentCSS.display == 'flex' && Sortable.lastParentCSS['flex-direction'].indexOf('row') === 0),
             isWide = (target.offsetWidth > Sortable.draggableItem.offsetWidth),
             isLong = (target.offsetHeight > Sortable.draggableItem.offsetHeight),
             halfway = (floating ? (e.clientX - targetRect.left) / width : (e.clientY - targetRect.top) / height) > 0.5,
@@ -815,7 +812,6 @@ const Sortable = (function () {
       newIndex =
 
       Sortable.lastEl =
-      lastCSS =
 
       putSortable =
       activeGroup =
