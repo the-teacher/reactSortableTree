@@ -68,10 +68,6 @@ import {
   _dispatchEvent
 } from './helpers/events'
 
-import {
-  _triggerDragStart
-} from './helpers/handlers'
-
 function getFirstSortableParent (el) {
   if (el.sortableInstance) return el
   var sortableParent = null
@@ -198,7 +194,7 @@ const Sortable = (function () {
           _toggleClass(Sortable.draggableItem, options.chosenClass, true)
 
           // Bind the events: dragstart/dragend
-          _triggerDragStart.bind(_this)(e, touch, rootEl, Sortable.draggableItem)
+          _this._triggerDragStart(e, touch, rootEl, Sortable.draggableItem)
 
           // Drag start event
           _dispatchEvent(_this, rootEl, cloneEl, 'choose', Sortable.draggableItem, rootEl, rootEl, oldIndex)
@@ -432,6 +428,39 @@ const Sortable = (function () {
       }
     }
 
+    this._triggerDragStart = function (evt, touch, rootEl, dragEl) {
+      touch = touch || (evt.pointerType == 'touch' ? evt : null)
+
+      if (touch) {
+        // Touch device support
+        tapEvt = {
+          target: dragEl,
+          clientX: touch.clientX,
+          clientY: touch.clientY
+        };
+
+        this._onDragStart(tapEvt, 'touch')
+      }
+      else if (!this.nativeDraggable) {
+        this._onDragStart(tapEvt, true)
+      }
+      else {
+        _on(dragEl, 'dragend', this)
+        _on(rootEl, 'dragstart', this._onDragStart)
+      }
+
+      try {
+        if (doc.selection) {
+          // Timeout neccessary for IE9
+          _nextTick(function () {
+            doc.selection.empty()
+          })
+        } else {
+          win.getSelection().removeAllRanges()
+        }
+      } catch (err) {
+      }
+    }
     this._onDragStart =  function (e, useFallback) {
       var el = getFirstSortableParent(e.target)
 
@@ -1069,9 +1098,7 @@ const Sortable = (function () {
 
   // Fixed #973:
   _on(doc, 'touchmove', function (e) {
-    if (activeSortableItem) {
-      e.preventDefault()
-    }
+    if (activeSortableItem) { e.preventDefault() }
   })
 
   return initialize;
