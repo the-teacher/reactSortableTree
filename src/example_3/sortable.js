@@ -1096,9 +1096,11 @@ const Sortable = (function () {
     options.store && this.sort(options.store.get(this))
   }
 
-  // Fixed #973:
+  // Fixed https://github.com/RubaXa/Sortable/issues/973
   _on(doc, 'touchmove', function (e) {
-    if (activeSortableItem) { e.preventDefault() }
+    if (activeSortableItem) {
+      e.preventDefault()
+    }
   })
 
   return initialize;
