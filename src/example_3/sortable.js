@@ -95,7 +95,6 @@ const Sortable = (function () {
     nextEl,
     lastDownEl,
 
-    scrollEl,
     scrollParentEl,
     scrollCustomFn,
 
@@ -817,7 +816,6 @@ const Sortable = (function () {
       cloneEl =
       lastDownEl =
 
-      scrollEl =
       scrollParentEl =
 
       el.tapEvt =

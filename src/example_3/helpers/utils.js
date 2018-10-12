@@ -97,7 +97,7 @@ function _extend(dst, src) {
   return dst;
 }
 
-const _autoScroll = _throttle(function (evt, options, rootEl, scrollParentEl, autoScroll) {
+const _autoScroll = _throttle(function (e, options, rootEl, scrollParentEl, autoScroll) {
   // Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
   if (rootEl && options.scroll) {
     var _this = rootEl.sortableInstance,
@@ -106,8 +106,8 @@ const _autoScroll = _throttle(function (evt, options, rootEl, scrollParentEl, au
       sens = options.scrollSensitivity,
       speed = options.scrollSpeed,
 
-      x = evt.clientX,
-      y = evt.clientY,
+      x = e.clientX,
+      y = e.clientY,
 
       winWidth = window.innerWidth,
       winHeight = window.innerHeight,
@@ -169,7 +169,7 @@ const _autoScroll = _throttle(function (evt, options, rootEl, scrollParentEl, au
           scrollOffsetX = vx ? vx * speed : 0;
 
           if ('function' === typeof(scrollCustomFn)) {
-            if (scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt, touchEvt, el) !== 'continue') {
+            if (scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, e, touchEvt, el) !== 'continue') {
               return;
             }
           }
