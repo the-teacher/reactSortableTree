@@ -97,7 +97,7 @@ function _extend(dst, src) {
   return dst;
 }
 
-const _autoScroll = _throttle(function (e, options, rootEl, scrollParentEl, autoScroll) {
+const _autoScroll = _throttle(function (e, options, rootEl, sortableObj, autoScroll) {
   // Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
   if (rootEl && options.scroll) {
     var _this = rootEl.sortableInstance,
@@ -120,9 +120,9 @@ const _autoScroll = _throttle(function (e, options, rootEl, scrollParentEl, auto
     ;
 
     // Detect scrollEl
-    if (scrollParentEl !== rootEl) {
+    if (sortableObj.scrollParentEl !== rootEl) {
       var scrollEl = options.scroll;
-      scrollParentEl = rootEl;
+      sortableObj.scrollParentEl = rootEl;
       var scrollCustomFn = options.scrollFn;
 
       if (scrollEl === true) {

@@ -90,7 +90,6 @@ const Sortable = (function () {
   raiseExceptionIfNotBrowserEnvironment()
 
   var
-    scrollParentEl,
     scrollCustomFn,
 
     lastEl,
@@ -586,7 +585,7 @@ const Sortable = (function () {
         (e.rootEl === void 0 || e.rootEl === this.el) // touch fallback
       ) {
         // Smart auto-scrolling
-        _autoScroll(e, options, this.el, scrollParentEl, autoScroll)
+        _autoScroll(e, options, this.el, Sortable, autoScroll)
 
         if (_silent) {
           return;
@@ -810,8 +809,7 @@ const Sortable = (function () {
       Sortable.nextEl =
       Sortable.cloneEl =
       Sortable.lastDownEl =
-
-      scrollParentEl =
+      Sortable.scrollParentEl =
 
       el.tapEvt =
       el.touchEvt =
