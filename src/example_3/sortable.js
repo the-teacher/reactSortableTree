@@ -90,8 +90,6 @@ const Sortable = (function () {
   raiseExceptionIfNotBrowserEnvironment()
 
   var
-    scrollCustomFn,
-
     lastEl,
     lastCSS,
     lastParentCSS,
