@@ -90,7 +90,6 @@ const Sortable = (function () {
   raiseExceptionIfNotBrowserEnvironment()
 
   var
-    lastEl,
     lastCSS,
     lastParentCSS,
 
@@ -640,8 +639,8 @@ const Sortable = (function () {
           }
         }
         else if (target && !target.animated && target !== Sortable.draggableItem && (target.parentNode.sortableInstance !== void 0)) {
-          if (lastEl !== target) {
-            lastEl = target;
+          if (Sortable.lastEl !== target) {
+            Sortable.lastEl = target;
             lastCSS = _css(target)
             lastParentCSS = _css(target.parentNode)
           }
@@ -815,7 +814,7 @@ const Sortable = (function () {
       moved =
       newIndex =
 
-      lastEl =
+      Sortable.lastEl =
       lastCSS =
 
       putSortable =
