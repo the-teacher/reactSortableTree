@@ -113,10 +113,6 @@ const Sortable = (function () {
     activeSortableItem,
 
     autoScroll = {},
-
-    tapEvt,
-    touchEvt,
-
     moved,
 
     forRepaintDummy,
@@ -167,7 +163,7 @@ const Sortable = (function () {
         dragStartFn;
 
       if (target && !Sortable.draggableItem && (target.parentNode === el)) {
-        tapEvt = e;
+        Sortable.tapEvt = e;
 
         rootEl = el;
         Sortable.draggableItem = target;
@@ -345,24 +341,24 @@ const Sortable = (function () {
       }
     }
     this._emulateDragOver = function () {
-      if (touchEvt) {
-        if (this._lastX === touchEvt.clientX && this._lastY === touchEvt.clientY) {
+      if (Sortable.touchEvt) {
+        if (this._lastX === Sortable.touchEvt.clientX && this._lastY === Sortable.touchEvt.clientY) {
           return;
         }
 
-        this._lastX = touchEvt.clientX;
-        this._lastY = touchEvt.clientY;
+        this._lastX = Sortable.touchEvt.clientX;
+        this._lastY = Sortable.touchEvt.clientY;
 
         if (!supportCssPointerEvents) {
           _css(ghostEl, 'display', 'none')
         }
 
-        var target = doc.elementFromPoint(touchEvt.clientX, touchEvt.clientY)
+        var target = doc.elementFromPoint(Sortable.touchEvt.clientX, Sortable.touchEvt.clientY)
         var parent = target;
         var i = touchDragOverListeners.length;
 
         while (target && target.shadowRoot) {
-          target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY)
+          target = target.shadowRoot.elementFromPoint(Sortable.touchEvt.clientX, Sortable.touchEvt.clientY)
           parent = target;
         }
 
@@ -371,8 +367,8 @@ const Sortable = (function () {
             if (parent.sortableInstance) {
               while (i--) {
                 touchDragOverListeners[i]({
-                  clientX: touchEvt.clientX,
-                  clientY: touchEvt.clientY,
+                  clientX: Sortable.touchEvt.clientX,
+                  clientY: Sortable.touchEvt.clientY,
                   target: target,
                   rootEl: parent
                 })
@@ -393,13 +389,13 @@ const Sortable = (function () {
       }
     }
     this._onTouchMove = function (e) {
-      if (tapEvt) {
+      if (Sortable.tapEvt) {
         var  options = this.options,
           fallbackTolerance = options.fallbackTolerance,
           fallbackOffset = options.fallbackOffset,
           touch = e.touches ? e.touches[0] : e,
-          dx = (touch.clientX - tapEvt.clientX) + fallbackOffset.x,
-          dy = (touch.clientY - tapEvt.clientY) + fallbackOffset.y,
+          dx = (touch.clientX - Sortable.tapEvt.clientX) + fallbackOffset.x,
+          dy = (touch.clientY - Sortable.tapEvt.clientY) + fallbackOffset.y,
           translate3d = e.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
         // only set the status to dragging, when we are actually dragging
@@ -417,7 +413,7 @@ const Sortable = (function () {
         this._appendGhost()
 
         moved = true;
-        touchEvt = touch;
+        Sortable.touchEvt = touch;
 
         _css(ghostEl, 'webkitTransform', translate3d)
         _css(ghostEl, 'mozTransform', translate3d)
@@ -433,16 +429,16 @@ const Sortable = (function () {
 
       if (touch) {
         // Touch device support
-        tapEvt = {
+        Sortable.tapEvt = {
           target: dragEl,
           clientX: touch.clientX,
           clientY: touch.clientY
         };
 
-        this._onDragStart(tapEvt, 'touch')
+        this._onDragStart(Sortable.tapEvt, 'touch')
       }
       else if (!this.nativeDraggable) {
-        this._onDragStart(tapEvt, true)
+        this._onDragStart(Sortable.tapEvt, true)
       }
       else {
         _on(dragEl, 'dragend', this)
@@ -818,8 +814,8 @@ const Sortable = (function () {
       scrollEl =
       scrollParentEl =
 
-      tapEvt =
-      touchEvt =
+      Sortable.tapEvt =
+      Sortable.touchEvt =
 
       moved =
       newIndex =
