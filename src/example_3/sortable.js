@@ -90,7 +90,6 @@ const Sortable = (function () {
   raiseExceptionIfNotBrowserEnvironment()
 
   var
-    putSortable,
     activeSortableItem,
 
     autoScroll = {},
@@ -555,7 +554,7 @@ const Sortable = (function () {
         (isOwner
           ? canSort || (revert = !Sortable.rootEl.contains(Sortable.draggableItem)) // Reverting item into the original list
           : (
-            putSortable === this ||
+            Sortable.putSortable === this ||
             (
               (activeSortable.lastPullMode = Sortable.activeGroup.checkPull(this, activeSortable, Sortable.draggableItem, e)) &&
               group.checkPut(this, activeSortable, Sortable.draggableItem, e)
@@ -574,8 +573,8 @@ const Sortable = (function () {
         target = _closest(e.target, options.draggable, el)
         dragRect = Sortable.draggableItem.getBoundingClientRect()
 
-        if (putSortable !== this) {
-          putSortable = this;
+        if (Sortable.putSortable !== this) {
+          Sortable.putSortable = this;
           isMovingBetweenSortable = true;
         }
 
@@ -799,7 +798,7 @@ const Sortable = (function () {
 
       Sortable.lastEl =
 
-      putSortable =
+      Sortable.putSortable =
       Sortable.activeGroup =
       activeSortableItem = null;
 
