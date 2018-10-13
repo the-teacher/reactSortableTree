@@ -91,8 +91,6 @@ const Sortable = (function () {
 
   var
     autoScroll = {},
-
-    _silent = false,
     savedInputChecked = [],
     touchDragOverListeners = []
   ;
@@ -563,7 +561,7 @@ const Sortable = (function () {
         // Smart auto-scrolling
         _autoScroll(e, options, this.el, Sortable, autoScroll)
 
-        if (_silent) {
+        if (Sortable.silent) {
           return;
         }
 
@@ -660,8 +658,8 @@ const Sortable = (function () {
               after = (moveVector === 1)
             }
 
-            _silent = true;
-            setTimeout(function () { _silent = false }, 30)
+            Sortable.silent = true;
+            setTimeout(function () { Sortable.silent = false }, 30)
 
             _cloneHide(activeSortable, Sortable.rootEl, Sortable.cloneEl, Sortable.draggableItem, isOwner)
 
@@ -986,6 +984,7 @@ const Sortable = (function () {
 
   function initialize(el, options) {
     htmlElementIsRequired(el)
+
     _defineImplementationMethods.bind(this)()
 
     // Root element
@@ -1075,5 +1074,6 @@ const Sortable = (function () {
 })()
 
 Sortable.version = '1.7.1'
+Sortable.silent = false
 
 export default Sortable
