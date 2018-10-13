@@ -91,7 +91,6 @@ const Sortable = (function () {
 
   var
     autoScroll = {},
-    forRepaintDummy,
 
     _silent = false,
     savedInputChecked = [],
@@ -862,7 +861,7 @@ const Sortable = (function () {
           + (prevRect.top - currentRect.top) + 'px,0)'
         )
 
-        forRepaintDummy = target.offsetWidth; // repaint
+        var forRepaintDummy = target.offsetWidth; // repaint
 
         _css(target, 'transition', 'all ' + ms + 'ms')
         _css(target, 'transform', 'translate3d(0,0,0)')
