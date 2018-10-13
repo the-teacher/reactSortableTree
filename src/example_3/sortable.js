@@ -57,7 +57,8 @@ import {
   _generateId,
   _index,
   _globalDragOver,
-  _disableDraggable
+  _disableDraggable,
+  getFirstSortableParent
 } from './helpers/utils'
 
 import {
@@ -71,22 +72,6 @@ import {
   _off,
   _dispatchEvent
 } from './helpers/events'
-
-function getFirstSortableParent (el) {
-  if (el.sortableInstance) return el
-  var sortableParent = null
-
-  while (el) {
-    if (el.sortableInstance) {
-      sortableParent = el
-      break
-    }
-
-    el = el.parentElement
-  }
-
-  return el
-}
 
 const Sortable = (function () {
   'use strict';
@@ -771,8 +756,6 @@ const Sortable = (function () {
       this._nulling(e)
     }
     this._nulling = function(e) {
-      var el = getFirstSortableParent(e.target)
-
       Sortable.rootEl =
       Sortable.draggableItem =
       Sortable.parentEl =

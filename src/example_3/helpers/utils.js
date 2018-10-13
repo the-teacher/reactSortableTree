@@ -283,6 +283,22 @@ function _disableDraggable(el) {
   el.draggable = false;
 }
 
+function getFirstSortableParent (el) {
+  if (el.sortableInstance) return el
+  var sortableParent = null
+
+  while (el) {
+    if (el.sortableInstance) {
+      sortableParent = el
+      break
+    }
+
+    el = el.parentElement
+  }
+
+  return el
+}
+
 export {
   _cloneHide,
   _closest,
@@ -298,5 +314,6 @@ export {
   _generateId,
   _index,
   _globalDragOver,
-  _disableDraggable
+  _disableDraggable,
+  getFirstSortableParent
 }
