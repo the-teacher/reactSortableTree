@@ -90,8 +90,6 @@ const Sortable = (function () {
   raiseExceptionIfNotBrowserEnvironment()
 
   var
-    activeSortableItem,
-
     autoScroll = {},
     forRepaintDummy,
 
@@ -310,7 +308,7 @@ const Sortable = (function () {
         _toggleClass(Sortable.draggableItem, options.ghostClass, true)
         _toggleClass(Sortable.draggableItem, options.dragClass, false)
 
-        activeSortableItem = this;
+        Sortable.activeSortableItem = this;
 
         // Drag start event
         _dispatchEvent(this, Sortable.rootEl, Sortable.cloneEl, 'start', Sortable.draggableItem, Sortable.rootEl, Sortable.rootEl, Sortable.oldIndex)
@@ -377,7 +375,7 @@ const Sortable = (function () {
           translate3d = e.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
         // only set the status to dragging, when we are actually dragging
-        if (!activeSortableItem) {
+        if (!Sortable.activeSortableItem) {
           if (fallbackTolerance &&
             min(abs(touch.clientX - this._lastX), abs(touch.clientY - this._lastY)) < fallbackTolerance
           ) {
@@ -534,7 +532,7 @@ const Sortable = (function () {
         revert,
         options = this.options,
         group = options.group,
-        activeSortable = activeSortableItem,
+        activeSortable = Sortable.activeSortableItem,
         isOwner = (Sortable.activeGroup === group),
         isMovingBetweenSortable = false,
         canSort = options.sort;
@@ -714,7 +712,7 @@ const Sortable = (function () {
 
         Sortable.ghostEl && Sortable.ghostEl.parentNode && Sortable.ghostEl.parentNode.removeChild(Sortable.ghostEl)
 
-        if (Sortable.rootEl === Sortable.parentEl || activeSortableItem.lastPullMode !== 'clone') {
+        if (Sortable.rootEl === Sortable.parentEl || Sortable.activeSortableItem.lastPullMode !== 'clone') {
           // Remove clone
           Sortable.cloneEl && Sortable.cloneEl.parentNode && Sortable.cloneEl.parentNode.removeChild(Sortable.cloneEl)
         }
@@ -762,7 +760,7 @@ const Sortable = (function () {
             }
           }
 
-          if (activeSortableItem) {
+          if (Sortable.activeSortableItem) {
             /* jshint eqnull:true */
             if (Sortable.newIndex == null || Sortable.newIndex === -1) {
               Sortable.newIndex = Sortable.oldIndex;
@@ -800,7 +798,7 @@ const Sortable = (function () {
 
       Sortable.putSortable =
       Sortable.activeGroup =
-      activeSortableItem = null;
+      Sortable.activeSortableItem = null;
 
       savedInputChecked.forEach(function (el) {
         el.checked = true;
@@ -1069,7 +1067,7 @@ const Sortable = (function () {
 
   // Fixed https://github.com/RubaXa/Sortable/issues/973
   _on(doc, 'touchmove', function (e) {
-    if (activeSortableItem) {
+    if (Sortable.activeSortableItem) {
       e.preventDefault()
     }
   })
