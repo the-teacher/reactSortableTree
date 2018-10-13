@@ -90,7 +90,6 @@ const Sortable = (function () {
   raiseExceptionIfNotBrowserEnvironment()
 
   var
-    activeGroup,
     putSortable,
     activeSortableItem,
 
@@ -150,7 +149,7 @@ const Sortable = (function () {
         Sortable.parentEl = Sortable.draggableItem.parentNode;
         Sortable.nextEl = Sortable.draggableItem.nextSibling;
         Sortable.lastDownEl = target;
-        activeGroup = options.group;
+        Sortable.activeGroup = options.group;
         Sortable.oldIndex = startIndex;
 
         this._lastX = (touch || e).clientX;
@@ -446,7 +445,7 @@ const Sortable = (function () {
 
       _this._offUpEvents()
 
-      if (activeGroup.checkPull(_this, _this, Sortable.draggableItem, e)) {
+      if (Sortable.activeGroup.checkPull(_this, _this, Sortable.draggableItem, e)) {
         Sortable.cloneEl = clone(Sortable.draggableItem)
 
         Sortable.cloneEl.draggable = false
@@ -537,7 +536,7 @@ const Sortable = (function () {
         options = this.options,
         group = options.group,
         activeSortable = activeSortableItem,
-        isOwner = (activeGroup === group),
+        isOwner = (Sortable.activeGroup === group),
         isMovingBetweenSortable = false,
         canSort = options.sort;
 
@@ -558,7 +557,7 @@ const Sortable = (function () {
           : (
             putSortable === this ||
             (
-              (activeSortable.lastPullMode = activeGroup.checkPull(this, activeSortable, Sortable.draggableItem, e)) &&
+              (activeSortable.lastPullMode = Sortable.activeGroup.checkPull(this, activeSortable, Sortable.draggableItem, e)) &&
               group.checkPut(this, activeSortable, Sortable.draggableItem, e)
             )
           )
@@ -801,7 +800,7 @@ const Sortable = (function () {
       Sortable.lastEl =
 
       putSortable =
-      activeGroup =
+      Sortable.activeGroup =
       activeSortableItem = null;
 
       savedInputChecked.forEach(function (el) {
