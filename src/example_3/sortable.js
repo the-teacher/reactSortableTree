@@ -17,6 +17,10 @@
 // _offUpEvents
 // _nulling
 
+// Mobile version
+// Tap events. Scrolling to top for small screens was broken somewhere
+// TODO: MUST BE CHECKED AND FIXED
+
 import {
   log
 } from '../shared/helpers'
