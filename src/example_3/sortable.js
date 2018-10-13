@@ -94,7 +94,6 @@ const Sortable = (function () {
   raiseExceptionIfNotBrowserEnvironment()
 
   var
-    savedInputChecked = [],
     touchDragOverListeners = []
   ;
 
@@ -800,10 +799,10 @@ const Sortable = (function () {
       Sortable.activeGroup =
       Sortable.activeSortableItem = null;
 
-      savedInputChecked.forEach(function (el) {
+      Sortable.savedInputChecked.forEach(function (el) {
         el.checked = true;
       })
-      savedInputChecked.length = 0;
+      Sortable.savedInputChecked.length = 0;
     }
 
     this._appendGhost =  function () {
@@ -971,14 +970,14 @@ const Sortable = (function () {
     }
 
     this._saveInputCheckedState = function (root) {
-      savedInputChecked.length = 0;
+      Sortable.savedInputChecked.length = 0;
 
       var inputs = root.getElementsByTagName('input')
       var idx = inputs.length;
 
       while (idx--) {
         var el = inputs[idx];
-        el.checked && savedInputChecked.push(el)
+        el.checked && Sortable.savedInputChecked.push(el)
       }
     }
   }
@@ -1080,5 +1079,6 @@ Sortable.version = '1.7.1'
 
 Sortable.silent = false
 Sortable.autoScroll = {}
+Sortable.savedInputChecked = []
 
 export default Sortable
