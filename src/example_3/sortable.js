@@ -93,10 +93,6 @@ const Sortable = (function () {
 
   raiseExceptionIfNotBrowserEnvironment()
 
-  var
-    touchDragOverListeners = []
-  ;
-
   // Implementation functions
   function _defineImplementationMethods () {
     this.handleEvent = function (e) {
@@ -139,7 +135,6 @@ const Sortable = (function () {
 
       if (target && !Sortable.draggableItem && (target.parentNode === el)) {
         Sortable.tapEvt = e;
-
         Sortable.rootEl = el;
         Sortable.draggableItem = target;
         Sortable.parentEl = Sortable.draggableItem.parentNode;
@@ -330,7 +325,7 @@ const Sortable = (function () {
 
         var target = doc.elementFromPoint(Sortable.touchEvt.clientX, Sortable.touchEvt.clientY)
         var parent = target;
-        var i = touchDragOverListeners.length;
+        var i = Sortable.touchDragOverListeners.length;
 
         while (target && target.shadowRoot) {
           target = target.shadowRoot.elementFromPoint(Sortable.touchEvt.clientX, Sortable.touchEvt.clientY)
@@ -341,7 +336,7 @@ const Sortable = (function () {
           do {
             if (parent.sortableInstance) {
               while (i--) {
-                touchDragOverListeners[i]({
+                Sortable.touchDragOverListeners[i]({
                   clientX: Sortable.touchEvt.clientX,
                   clientY: Sortable.touchEvt.clientY,
                   target: target,
@@ -922,7 +917,7 @@ const Sortable = (function () {
         el.removeAttribute('draggable')
       })
 
-      touchDragOverListeners.splice(touchDragOverListeners.indexOf(this._onDragOver), 1)
+      Sortable.touchDragOverListeners.splice(Sortable.touchDragOverListeners.indexOf(this._onDragOver), 1)
 
       this._onDrop()
 
@@ -1059,7 +1054,7 @@ const Sortable = (function () {
       _on(el, 'dragenter', this)
     }
 
-    touchDragOverListeners.push(this._onDragOver)
+    Sortable.touchDragOverListeners.push(this._onDragOver)
 
     // Restore sorting
     options.store && this.sort(options.store.get(this))
@@ -1080,5 +1075,6 @@ Sortable.version = '1.7.1'
 Sortable.silent = false
 Sortable.autoScroll = {}
 Sortable.savedInputChecked = []
+Sortable.touchDragOverListeners = []
 
 export default Sortable
