@@ -127,7 +127,7 @@ const Sortable = (function () {
         SortableCurrentState.parentEl = SortableCurrentState.draggableItem.parentNode;
         SortableCurrentState.nextEl = SortableCurrentState.draggableItem.nextSibling;
         SortableCurrentState.lastDownEl = target;
-        Sortable.activeGroup = options.group;
+        SortableCurrentState.activeGroup = options.group;
         Sortable.oldIndex = startIndex;
 
         this._lastX = (touch || e).clientX;
@@ -423,7 +423,7 @@ const Sortable = (function () {
 
       _this._offUpEvents()
 
-      if (Sortable.activeGroup.checkPull(_this, _this, SortableCurrentState.draggableItem, e)) {
+      if (SortableCurrentState.activeGroup.checkPull(_this, _this, SortableCurrentState.draggableItem, e)) {
         Sortable.cloneEl = clone(SortableCurrentState.draggableItem)
 
         Sortable.cloneEl.draggable = false
@@ -514,7 +514,7 @@ const Sortable = (function () {
         options = this.options,
         group = options.group,
         activeSortable = Sortable.activeSortableItem,
-        isOwner = (Sortable.activeGroup === group),
+        isOwner = (SortableCurrentState.activeGroup === group),
         isMovingBetweenSortable = false,
         canSort = options.sort;
 
@@ -535,7 +535,7 @@ const Sortable = (function () {
           : (
             Sortable.putSortable === this ||
             (
-              (activeSortable.lastPullMode = Sortable.activeGroup.checkPull(this, activeSortable, SortableCurrentState.draggableItem, e)) &&
+              (activeSortable.lastPullMode = SortableCurrentState.activeGroup.checkPull(this, activeSortable, SortableCurrentState.draggableItem, e)) &&
               group.checkPut(this, activeSortable, SortableCurrentState.draggableItem, e)
             )
           )
@@ -776,7 +776,7 @@ const Sortable = (function () {
       Sortable.lastEl =
 
       Sortable.putSortable =
-      Sortable.activeGroup =
+      SortableCurrentState.activeGroup =
       Sortable.activeSortableItem = null;
 
       Sortable.savedInputChecked.forEach(function (el) {
