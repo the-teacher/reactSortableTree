@@ -126,7 +126,7 @@ const Sortable = (function () {
         SortableCurrentState.draggableItem = target;
         SortableCurrentState.parentEl = SortableCurrentState.draggableItem.parentNode;
         SortableCurrentState.nextEl = SortableCurrentState.draggableItem.nextSibling;
-        Sortable.lastDownEl = target;
+        SortableCurrentState.lastDownEl = target;
         Sortable.activeGroup = options.group;
         Sortable.oldIndex = startIndex;
 
@@ -224,7 +224,7 @@ const Sortable = (function () {
         return;
       }
 
-      if (Sortable.lastDownEl === target) {
+      if (SortableCurrentState.lastDownEl === target) {
         // Ignoring duplicate `down`
         return;
       }
@@ -764,7 +764,7 @@ const Sortable = (function () {
       Sortable.ghostEl =
       SortableCurrentState.nextEl =
       Sortable.cloneEl =
-      Sortable.lastDownEl =
+      SortableCurrentState.lastDownEl =
       Sortable.scrollParentEl =
 
       Sortable.tapEvt =
