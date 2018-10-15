@@ -125,7 +125,7 @@ const Sortable = (function () {
         Sortable.rootEl = el;
         SortableCurrentState.draggableItem = target;
         SortableCurrentState.parentEl = SortableCurrentState.draggableItem.parentNode;
-        Sortable.nextEl = SortableCurrentState.draggableItem.nextSibling;
+        SortableCurrentState.nextEl = SortableCurrentState.draggableItem.nextSibling;
         Sortable.lastDownEl = target;
         Sortable.activeGroup = options.group;
         Sortable.oldIndex = startIndex;
@@ -561,8 +561,8 @@ const Sortable = (function () {
           _cloneHide(activeSortable, Sortable.rootEl, Sortable.cloneEl, SortableCurrentState.draggableItem, true)
           SortableCurrentState.parentEl = Sortable.rootEl; // actualization
 
-          if (Sortable.cloneEl || Sortable.nextEl) {
-            Sortable.rootEl.insertBefore(SortableCurrentState.draggableItem, Sortable.cloneEl || Sortable.nextEl)
+          if (Sortable.cloneEl || SortableCurrentState.nextEl) {
+            Sortable.rootEl.insertBefore(SortableCurrentState.draggableItem, Sortable.cloneEl || SortableCurrentState.nextEl)
           }
           else if (!canSort) {
             Sortable.rootEl.appendChild(SortableCurrentState.draggableItem)
@@ -729,7 +729,7 @@ const Sortable = (function () {
             }
           }
           else {
-            if (SortableCurrentState.draggableItem.nextSibling !== Sortable.nextEl) {
+            if (SortableCurrentState.draggableItem.nextSibling !== SortableCurrentState.nextEl) {
               // Get the index of the dragged element within its parent
               Sortable.newIndex = _index(SortableCurrentState.draggableItem, options.draggable)
 
@@ -762,7 +762,7 @@ const Sortable = (function () {
       SortableCurrentState.draggableItem =
       SortableCurrentState.parentEl =
       Sortable.ghostEl =
-      Sortable.nextEl =
+      SortableCurrentState.nextEl =
       Sortable.cloneEl =
       Sortable.lastDownEl =
       Sortable.scrollParentEl =
