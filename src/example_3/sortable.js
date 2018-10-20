@@ -79,6 +79,24 @@ function disableDraggableForSpecificTags (ignoreTags, sortableStateObj) {
   })
 }
 
+function dragStartFn (sortable, sortableStateObj, e, touch, options) {
+  // Delayed drag has been triggered
+  // we can re-enable the events: touchmove/mousemove
+  sortable._disableDelayedDrag()
+
+  // Make the element draggable
+  sortableStateObj.draggableItem.draggable = sortable.nativeDraggable;
+
+  // Chosen item
+  _toggleClass(sortableStateObj.draggableItem, options.chosenClass, true)
+
+  // Bind the events: dragstart/dragend
+  sortable._triggerDragStart(e, touch, sortableStateObj.rootEl, sortableStateObj.draggableItem)
+
+  // Drag start event
+  _dispatchEvent(sortable, 'choose', sortableStateObj)
+};
+
 const Sortable = (function () {
   'use strict';
 
@@ -121,8 +139,7 @@ const Sortable = (function () {
 
       var _this = this,
         options = _this.options,
-        ownerDocument = el.ownerDocument,
-        dragStartFn;
+        ownerDocument = el.ownerDocument;
 
       if (target && !SortableCurrentState.draggableItem && (target.parentNode === el)) {
         SortableCurrentState.tapEvt = e;
@@ -137,24 +154,6 @@ const Sortable = (function () {
 
         this._lastX = (touch || e).clientX;
         this._lastY = (touch || e).clientY;
-
-        dragStartFn = function () {
-          // Delayed drag has been triggered
-          // we can re-enable the events: touchmove/mousemove
-          _this._disableDelayedDrag()
-
-          // Make the element draggable
-          SortableCurrentState.draggableItem.draggable = _this.nativeDraggable;
-
-          // Chosen item
-          _toggleClass(SortableCurrentState.draggableItem, options.chosenClass, true)
-
-          // Bind the events: dragstart/dragend
-          _this._triggerDragStart(e, touch, SortableCurrentState.rootEl, SortableCurrentState.draggableItem)
-
-          // Drag start event
-          _dispatchEvent(_this, 'choose', SortableCurrentState)
-        };
 
         // Disable "draggable" functionality for specific tags
         // "a, img" by default
@@ -178,9 +177,11 @@ const Sortable = (function () {
           _on(ownerDocument, 'touchmove', _this._delayedDragTouchMoveHandler)
           options.supportPointer && _on(ownerDocument, 'pointermove', _this._delayedDragTouchMoveHandler)
 
-          _this._dragStartTimer = setTimeout(dragStartFn, options.delay)
+          _this._dragStartTimer = setTimeout(function(){
+            dragStartFn(el.sortableInstance, SortableCurrentState, e, touch, options)
+          }, options.delay)
         } else {
-          dragStartFn()
+          dragStartFn(el.sortableInstance, SortableCurrentState, e, touch, options)
         }
       }
     }
