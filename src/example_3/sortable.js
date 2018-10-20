@@ -9,13 +9,11 @@
 // _onDragStart
 // _offUpEvents
 // _dragStarted
-// _nulling
 // handleEvent
 // (25)handleEvent
 // _onDragOver
 // _onDrop
 // _offUpEvents
-// _nulling
 
 // Mobile version
 // Tap events. Scrolling to top for small screens was broken somewhere
@@ -294,7 +292,7 @@ const Sortable = (function () {
         // Drag start event
         _dispatchEvent(this, SortableCurrentState.rootEl, SortableCurrentState.cloneEl, 'start', SortableCurrentState.draggableItem, SortableCurrentState.rootEl, SortableCurrentState.rootEl, SortableCurrentState.oldIndex)
       } else {
-        this._nulling(e)
+        SortableCurrentState.reset()
       }
     }
     this._emulateDragOver = function () {
@@ -755,9 +753,6 @@ const Sortable = (function () {
         }
 
       }
-      this._nulling(e)
-    }
-    this._nulling = function(e) {
       SortableCurrentState.reset()
     }
 
@@ -885,6 +880,7 @@ const Sortable = (function () {
       this.el = el = null;
     }
 
+    // Must be extracted to a separated file
     this.toArray = function () {
       var order = [],
         el,
@@ -924,7 +920,6 @@ const Sortable = (function () {
       var store = this.options.store;
       store && store.set(this)
     }
-
     this._saveInputCheckedState = function (root) {
       SortableCurrentState.savedInputChecked.length = 0;
 
