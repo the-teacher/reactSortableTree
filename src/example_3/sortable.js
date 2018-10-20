@@ -543,7 +543,7 @@ const Sortable = (function () {
         (e.rootEl === void 0 || e.rootEl === this.el) // touch fallback
       ) {
         // Smart auto-scrolling
-        _autoScroll(e, options, this.el, SortableCurrentState, Sortable.autoScroll)
+        _autoScroll(e, options, this.el, SortableCurrentState, SortableCurrentState.autoScroll)
 
         if (SortableCurrentState.silent) {
           return;
@@ -668,7 +668,7 @@ const Sortable = (function () {
         options = this.options;
 
       clearInterval(this._loopId)
-      clearInterval(Sortable.autoScroll.pid)
+      clearInterval(SortableCurrentState.autoScroll.pid)
       clearTimeout(this._dragStartTimer)
 
       _cancelNextTick(this._cloneId)
@@ -1056,7 +1056,7 @@ const Sortable = (function () {
 Sortable.version = '1.7.1'
 
 SortableCurrentState.silent = false
-Sortable.autoScroll = {}
+SortableCurrentState.autoScroll = {}
 Sortable.savedInputChecked = []
 Sortable.touchDragOverListeners = []
 
