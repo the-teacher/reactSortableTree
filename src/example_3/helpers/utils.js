@@ -328,6 +328,18 @@ function dragStartFn (sortable, sortableStateObj, e, touch, options) {
   _dispatchEvent(sortable, 'choose', sortableStateObj)
 };
 
+function setupSotrableStateObject(sortableStateObj, e, el, target, group, startIndex) {
+  sortableStateObj.tapEvt = e;
+  sortableStateObj.rootEl = el;
+  sortableStateObj.draggableItem = target;
+  sortableStateObj.parentEl = sortableStateObj.draggableItem.parentNode;
+  sortableStateObj.nextEl = sortableStateObj.draggableItem.nextSibling;
+  sortableStateObj.lastDownEl = target;
+  sortableStateObj.activeGroup = group;
+  sortableStateObj.oldIndex = startIndex;
+  sortableStateObj.draggableItem.style['will-change'] = 'all';
+}
+
 export {
   _cloneHide,
   _closest,
@@ -346,5 +358,6 @@ export {
   _disableDraggable,
   getFirstSortableParent,
   disableDraggableForSpecificTags,
-  dragStartFn
+  dragStartFn,
+  setupSotrableStateObject
 }

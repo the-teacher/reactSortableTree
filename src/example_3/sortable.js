@@ -58,7 +58,8 @@ import {
   _disableDraggable,
   getFirstSortableParent,
   disableDraggableForSpecificTags,
-  dragStartFn
+  dragStartFn,
+  setupSotrableStateObject
 } from './helpers/utils'
 
 import { _toggleClass, _css, _find } from './helpers/css'
@@ -116,15 +117,7 @@ const Sortable = (function () {
         ownerDocument = el.ownerDocument;
 
       if (target && !SortableCurrentState.draggableItem && (target.parentNode === el)) {
-        SortableCurrentState.tapEvt = e;
-        SortableCurrentState.rootEl = el;
-        SortableCurrentState.draggableItem = target;
-        SortableCurrentState.parentEl = SortableCurrentState.draggableItem.parentNode;
-        SortableCurrentState.nextEl = SortableCurrentState.draggableItem.nextSibling;
-        SortableCurrentState.lastDownEl = target;
-        SortableCurrentState.activeGroup = options.group;
-        SortableCurrentState.oldIndex = startIndex;
-        SortableCurrentState.draggableItem.style['will-change'] = 'all';
+        setupSotrableStateObject(SortableCurrentState, e, el, target, options.group, startIndex)
 
         this._lastX = (touch || e).clientX;
         this._lastY = (touch || e).clientY;
