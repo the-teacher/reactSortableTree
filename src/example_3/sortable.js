@@ -73,6 +73,12 @@ import {
 
 import SortableCurrentState from './sortableCurrentState'
 
+function disableDraggableForSpecificTags (ignoreTags, sortableStateObj) {
+  ignoreTags.split(',').forEach(function (criteria) {
+    _find(sortableStateObj.draggableItem, criteria.trim(), _disableDraggable)
+  })
+}
+
 const Sortable = (function () {
   'use strict';
 
@@ -150,15 +156,15 @@ const Sortable = (function () {
           _dispatchEvent(_this, 'choose', SortableCurrentState)
         };
 
-        // Disable "draggable"
-        options.ignore.split(',').forEach(function (criteria) {
-          _find(SortableCurrentState.draggableItem, criteria.trim(), _disableDraggable)
-        })
+        // Disable "draggable" functionality for specific tags
+        // "a, img" by default
+        disableDraggableForSpecificTags(options.ignore, SortableCurrentState)
 
         _on(ownerDocument, 'mouseup', _this._onDrop)
         _on(ownerDocument, 'touchend', _this._onDrop)
         _on(ownerDocument, 'touchcancel', _this._onDrop)
         _on(ownerDocument, 'selectstart', _this)
+
         options.supportPointer && _on(ownerDocument, 'pointercancel', _this._onDrop)
 
         if (options.delay) {
