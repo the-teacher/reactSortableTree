@@ -777,10 +777,10 @@ const Sortable = (function () {
       SortableCurrentState.tapEvt =
       SortableCurrentState.touchEvt = null;
 
-      Sortable.savedInputChecked.forEach(function (el) {
+      SortableCurrentState.savedInputChecked.forEach(function (el) {
         el.checked = true;
       })
-      Sortable.savedInputChecked.length = 0;
+      SortableCurrentState.savedInputChecked.length = 0;
     }
 
     this._appendGhost =  function () {
@@ -948,14 +948,14 @@ const Sortable = (function () {
     }
 
     this._saveInputCheckedState = function (root) {
-      Sortable.savedInputChecked.length = 0;
+      SortableCurrentState.savedInputChecked.length = 0;
 
       var inputs = root.getElementsByTagName('input')
       var idx = inputs.length;
 
       while (idx--) {
         var el = inputs[idx];
-        el.checked && Sortable.savedInputChecked.push(el)
+        el.checked && SortableCurrentState.savedInputChecked.push(el)
       }
     }
   }
@@ -1057,7 +1057,7 @@ Sortable.version = '1.7.1'
 
 SortableCurrentState.silent = false
 SortableCurrentState.autoScroll = {}
-Sortable.savedInputChecked = []
+SortableCurrentState.savedInputChecked = []
 Sortable.touchDragOverListeners = []
 
 export default Sortable
