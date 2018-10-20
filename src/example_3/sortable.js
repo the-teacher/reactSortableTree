@@ -543,7 +543,7 @@ const Sortable = (function () {
         (e.rootEl === void 0 || e.rootEl === this.el) // touch fallback
       ) {
         // Smart auto-scrolling
-        _autoScroll(e, options, this.el, Sortable, Sortable.autoScroll)
+        _autoScroll(e, options, this.el, SortableCurrentState, Sortable.autoScroll)
 
         if (Sortable.silent) {
           return;
@@ -765,7 +765,7 @@ const Sortable = (function () {
       SortableCurrentState.nextEl =
       SortableCurrentState.cloneEl =
       SortableCurrentState.lastDownEl =
-      Sortable.scrollParentEl =
+      SortableCurrentState.scrollParentEl =
 
       Sortable.tapEvt =
       Sortable.touchEvt =
