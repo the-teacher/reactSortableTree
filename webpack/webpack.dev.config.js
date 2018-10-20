@@ -10,7 +10,8 @@ const webpackConfig = {
   entry: {
     example_1: `${rootPath}/src/example_1/index.js`,
     example_3: `${rootPath}/src/example_3/index.js`,
-    example_4: `${rootPath}/src/example_4/index.js`
+    example_4: `${rootPath}/src/example_4/index.js`,
+    example_5: `${rootPath}/src/example_5/index.js`
   },
 
   output: {

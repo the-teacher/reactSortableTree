@@ -381,8 +381,8 @@ const Sortable = (function () {
       }
     }
 
-    this._triggerDragStart = function (evt, touch, rootEl, dragEl) {
-      touch = touch || (evt.pointerType == 'touch' ? evt : null)
+    this._triggerDragStart = function (e, touch, rootEl, dragEl) {
+      touch = touch || (e.pointerType == 'touch' ? e : null)
 
       if (touch) {
         // Touch device support
