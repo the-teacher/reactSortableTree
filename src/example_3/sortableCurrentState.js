@@ -12,12 +12,12 @@ var SortableCurrentState = (function () {
     newIndex,
     oldIndex,
     activeGroup,
-
     lastEl,
     putSortable,
+    activeSortableItem,
+
     tapEvt,
-    touchEvt,
-    activeSortableItem;
+    touchEvt;
 
   var
     silent = false,
@@ -38,13 +38,12 @@ var SortableCurrentState = (function () {
     newIndex =
     oldIndex =
     activeGroup =
-
     lastEl =
     putSortable =
+    activeSortableItem = null;
 
     tapEvt =
-    touchEvt =
-    activeSortableItem;
+    touchEvt = null;
 
     savedInputChecked.forEach(function (el) {
       el.checked = true;
@@ -68,17 +67,17 @@ var SortableCurrentState = (function () {
     newIndex: newIndex,
     newIndex: oldIndex,
     activeSortableItem: activeSortableItem,
-
     lastEl: lastEl,
     putSortable: putSortable,
     activeGroup: activeGroup,
-    tapEvt: tapEvt,
-    touchEvt: touchEvt,
 
     silent: silent,
     autoScroll: autoScroll,
     savedInputChecked: savedInputChecked,
     touchDragOverListeners: touchDragOverListeners,
+
+    tapEvt: tapEvt,
+    touchEvt: touchEvt,
 
     destroy: destroy
   }

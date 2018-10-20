@@ -289,7 +289,7 @@ const Sortable = (function () {
         _toggleClass(SortableCurrentState.draggableItem, options.ghostClass, true)
         _toggleClass(SortableCurrentState.draggableItem, options.dragClass, false)
 
-        Sortable.activeSortableItem = this;
+        SortableCurrentState.activeSortableItem = this;
 
         // Drag start event
         _dispatchEvent(this, SortableCurrentState.rootEl, SortableCurrentState.cloneEl, 'start', SortableCurrentState.draggableItem, SortableCurrentState.rootEl, SortableCurrentState.rootEl, SortableCurrentState.oldIndex)
@@ -356,7 +356,7 @@ const Sortable = (function () {
           translate3d = e.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
         // only set the status to dragging, when we are actually dragging
-        if (!Sortable.activeSortableItem) {
+        if (!SortableCurrentState.activeSortableItem) {
           if (fallbackTolerance &&
             min(abs(touch.clientX - this._lastX), abs(touch.clientY - this._lastY)) < fallbackTolerance
           ) {
@@ -513,7 +513,7 @@ const Sortable = (function () {
         revert,
         options = this.options,
         group = options.group,
-        activeSortable = Sortable.activeSortableItem,
+        activeSortable = SortableCurrentState.activeSortableItem,
         isOwner = (SortableCurrentState.activeGroup === group),
         isMovingBetweenSortable = false,
         canSort = options.sort;
@@ -533,7 +533,7 @@ const Sortable = (function () {
         (isOwner
           ? canSort || (revert = !SortableCurrentState.rootEl.contains(SortableCurrentState.draggableItem)) // Reverting item into the original list
           : (
-            Sortable.putSortable === this ||
+            SortableCurrentState.putSortable === this ||
             (
               (activeSortable.lastPullMode = SortableCurrentState.activeGroup.checkPull(this, activeSortable, SortableCurrentState.draggableItem, e)) &&
               group.checkPut(this, activeSortable, SortableCurrentState.draggableItem, e)
@@ -552,8 +552,8 @@ const Sortable = (function () {
         target = _closest(e.target, options.draggable, el)
         dragRect = SortableCurrentState.draggableItem.getBoundingClientRect()
 
-        if (Sortable.putSortable !== this) {
-          Sortable.putSortable = this;
+        if (SortableCurrentState.putSortable !== this) {
+          SortableCurrentState.putSortable = this;
           isMovingBetweenSortable = true;
         }
 
@@ -600,8 +600,8 @@ const Sortable = (function () {
           }
         }
         else if (target && !target.animated && target !== SortableCurrentState.draggableItem && (target.parentNode.sortableInstance !== void 0)) {
-          if (Sortable.lastEl !== target) {
-            Sortable.lastEl = target;
+          if (SortableCurrentState.lastEl !== target) {
+            SortableCurrentState.lastEl = target;
             Sortable.lastCSS = _css(target)
             Sortable.lastParentCSS = _css(target.parentNode)
           }
@@ -693,7 +693,7 @@ const Sortable = (function () {
 
         SortableCurrentState.ghostEl && SortableCurrentState.ghostEl.parentNode && SortableCurrentState.ghostEl.parentNode.removeChild(SortableCurrentState.ghostEl)
 
-        if (SortableCurrentState.rootEl === SortableCurrentState.parentEl || Sortable.activeSortableItem.lastPullMode !== 'clone') {
+        if (SortableCurrentState.rootEl === SortableCurrentState.parentEl || SortableCurrentState.activeSortableItem.lastPullMode !== 'clone') {
           // Remove clone
           SortableCurrentState.cloneEl && SortableCurrentState.cloneEl.parentNode && SortableCurrentState.cloneEl.parentNode.removeChild(SortableCurrentState.cloneEl)
         }
@@ -741,7 +741,7 @@ const Sortable = (function () {
             }
           }
 
-          if (Sortable.activeSortableItem) {
+          if (SortableCurrentState.activeSortableItem) {
             /* jshint eqnull:true */
             if (SortableCurrentState.newIndex == null || SortableCurrentState.newIndex === -1) {
               SortableCurrentState.newIndex = SortableCurrentState.oldIndex;
@@ -770,13 +770,12 @@ const Sortable = (function () {
       SortableCurrentState.newIndex =
       SortableCurrentState.oldIndex =
       SortableCurrentState.activeGroup =
+      SortableCurrentState.lastEl =
+      SortableCurrentState.putSortable =
+      SortableCurrentState.activeSortableItem = null,
 
       Sortable.tapEvt =
-      Sortable.touchEvt =
-      Sortable.lastEl =
-
-      Sortable.putSortable =
-      Sortable.activeSortableItem = null;
+      Sortable.touchEvt = null;
 
       Sortable.savedInputChecked.forEach(function (el) {
         el.checked = true;
@@ -1046,7 +1045,7 @@ const Sortable = (function () {
 
   // Fixed https://github.com/RubaXa/Sortable/issues/973
   _on(doc, 'touchmove', function (e) {
-    if (Sortable.activeSortableItem) {
+    if (SortableCurrentState.activeSortableItem) {
       e.preventDefault()
     }
   })
