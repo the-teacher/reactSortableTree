@@ -12,6 +12,7 @@ function _cloneHide(sortable, rootEl, cloneEl, dragEl, state) {
     if (!state) {
       if (cloneEl.state) {
         if (sortable.options.group.revertClone) {
+          // SortableCurrentState.nextEl
           rootEl.insertBefore(cloneEl, nextEl)
           sortable._animate(dragEl, cloneEl)
         } else {
