@@ -298,24 +298,24 @@ const Sortable = (function () {
       }
     }
     this._emulateDragOver = function () {
-      if (Sortable.touchEvt) {
-        if (this._lastX === Sortable.touchEvt.clientX && this._lastY === Sortable.touchEvt.clientY) {
+      if (SortableCurrentState.touchEvt) {
+        if (this._lastX === SortableCurrentState.touchEvt.clientX && this._lastY === SortableCurrentState.touchEvt.clientY) {
           return;
         }
 
-        this._lastX = Sortable.touchEvt.clientX;
-        this._lastY = Sortable.touchEvt.clientY;
+        this._lastX = SortableCurrentState.touchEvt.clientX;
+        this._lastY = SortableCurrentState.touchEvt.clientY;
 
         if (!supportCssPointerEvents) {
           _css(SortableCurrentState.ghostEl, 'display', 'none')
         }
 
-        var target = doc.elementFromPoint(Sortable.touchEvt.clientX, Sortable.touchEvt.clientY)
+        var target = doc.elementFromPoint(SortableCurrentState.touchEvt.clientX, SortableCurrentState.touchEvt.clientY)
         var parent = target;
         var i = Sortable.touchDragOverListeners.length;
 
         while (target && target.shadowRoot) {
-          target = target.shadowRoot.elementFromPoint(Sortable.touchEvt.clientX, Sortable.touchEvt.clientY)
+          target = target.shadowRoot.elementFromPoint(SortableCurrentState.touchEvt.clientX, SortableCurrentState.touchEvt.clientY)
           parent = target;
         }
 
@@ -324,8 +324,8 @@ const Sortable = (function () {
             if (parent.sortableInstance) {
               while (i--) {
                 Sortable.touchDragOverListeners[i]({
-                  clientX: Sortable.touchEvt.clientX,
-                  clientY: Sortable.touchEvt.clientY,
+                  clientX: SortableCurrentState.touchEvt.clientX,
+                  clientY: SortableCurrentState.touchEvt.clientY,
                   target: target,
                   rootEl: parent
                 })
@@ -370,7 +370,7 @@ const Sortable = (function () {
         this._appendGhost()
 
         SortableCurrentState.moved = true;
-        Sortable.touchEvt = touch;
+        SortableCurrentState.touchEvt = touch;
 
         _css(SortableCurrentState.ghostEl, 'webkitTransform', translate3d)
         _css(SortableCurrentState.ghostEl, 'mozTransform', translate3d)
@@ -775,7 +775,7 @@ const Sortable = (function () {
       SortableCurrentState.activeSortableItem = null,
 
       SortableCurrentState.tapEvt =
-      Sortable.touchEvt = null;
+      SortableCurrentState.touchEvt = null;
 
       Sortable.savedInputChecked.forEach(function (el) {
         el.checked = true;

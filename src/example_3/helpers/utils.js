@@ -170,7 +170,7 @@ const _autoScroll = _throttle(function (e, options, rootEl, sortableObj, autoScr
           scrollOffsetX = vx ? vx * speed : 0;
 
           if ('function' === typeof(scrollCustomFn)) {
-            if (scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, e, touchEvt, el) !== 'continue') {
+            if (scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, e, sortableObj.touchEvt, el) !== 'continue') {
               return;
             }
           }
