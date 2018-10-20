@@ -32,13 +32,16 @@ var SortableCurrentState = (function () {
     cloneEl =
     lastDownEl =
     scrollParentEl =
-    tapEvt =
-    touchEvt =
     moved =
     newIndex =
+    oldIndex =
+    activeGroup =
+
     lastEl =
     putSortable =
-    activeGroup =
+
+    tapEvt =
+    touchEvt =
     activeSortableItem;
 
     savedInputChecked.forEach(function (el) {
@@ -59,14 +62,16 @@ var SortableCurrentState = (function () {
     cloneEl: cloneEl,
     lastDownEl: lastDownEl,
     scrollParentEl: scrollParentEl,
-    tapEvt: tapEvt,
-    touchEvt: touchEvt,
     moved: moved,
     newIndex: newIndex,
+    newIndex: oldIndex,
+    activeSortableItem: activeSortableItem,
+
     lastEl: lastEl,
     putSortable: putSortable,
     activeGroup: activeGroup,
-    activeSortableItem: activeSortableItem,
+    tapEvt: tapEvt,
+    touchEvt: touchEvt,
 
     silent: silent,
     autoScroll: autoScroll,

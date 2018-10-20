@@ -369,7 +369,7 @@ const Sortable = (function () {
         // as well as creating the ghost element on the document body
         this._appendGhost()
 
-        Sortable.moved = true;
+        SortableCurrentState.moved = true;
         Sortable.touchEvt = touch;
 
         _css(SortableCurrentState.ghostEl, 'webkitTransform', translate3d)
@@ -527,7 +527,7 @@ const Sortable = (function () {
         return;
       }
 
-      Sortable.moved = true;
+      SortableCurrentState.moved = true;
 
       if (activeSortable && !options.disabled &&
         (isOwner
@@ -686,7 +686,7 @@ const Sortable = (function () {
       this._offUpEvents()
 
       if (e) {
-        if (Sortable.moved) {
+        if (SortableCurrentState.moved) {
           e.preventDefault()
           !options.dropBubble && e.stopPropagation()
         }
@@ -766,17 +766,16 @@ const Sortable = (function () {
       SortableCurrentState.cloneEl =
       SortableCurrentState.lastDownEl =
       SortableCurrentState.scrollParentEl =
+      SortableCurrentState.moved =
+      SortableCurrentState.newIndex =
+      SortableCurrentState.oldIndex =
+      SortableCurrentState.activeGroup =
 
       Sortable.tapEvt =
       Sortable.touchEvt =
-
-      Sortable.moved =
-      SortableCurrentState.newIndex =
-
       Sortable.lastEl =
 
       Sortable.putSortable =
-      SortableCurrentState.activeGroup =
       Sortable.activeSortableItem = null;
 
       Sortable.savedInputChecked.forEach(function (el) {
