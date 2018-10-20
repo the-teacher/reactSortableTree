@@ -73,12 +73,15 @@ import {
 
 import SortableCurrentState from './sortableCurrentState'
 
+// Disable "draggable" functionality for specific tags
+// "a, img" by default
 function disableDraggableForSpecificTags (ignoreTags, sortableStateObj) {
   ignoreTags.split(',').forEach(function (criteria) {
     _find(sortableStateObj.draggableItem, criteria.trim(), _disableDraggable)
   })
 }
 
+// This method is being called on Drag Start
 function dragStartFn (sortable, sortableStateObj, e, touch, options) {
   // Delayed drag has been triggered
   // we can re-enable the events: touchmove/mousemove

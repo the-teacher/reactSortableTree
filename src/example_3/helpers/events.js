@@ -5,11 +5,11 @@ const captureMode = false
 function _on(el, event, fn) {
   el.addEventListener(event, fn, captureMode)
 }
-
 function _off(el, event, fn) {
   el.removeEventListener(event, fn, captureMode)
 }
 
+// Creates and fires a custom event
 function _dispatchEvent(sortable, name, sortableStateObj, originalEvt) {
   var
     rootEl = sortableStateObj.rootEl,
