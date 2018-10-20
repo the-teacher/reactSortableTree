@@ -10,7 +10,16 @@ function _off(el, event, fn) {
   el.removeEventListener(event, fn, captureMode)
 }
 
-function _dispatchEvent(sortable, rootEl, cloneEl, name, targetEl, toEl, fromEl, startIndex, newIndex, originalEvt) {
+function _dispatchEvent(sortable, name, sortableStateObj, originalEvt) {
+  var
+    rootEl = sortableStateObj.rootEl,
+    cloneEl = sortableStateObj.cloneEl,
+    targetEl = sortableStateObj.targetEl,
+    toEl = sortableStateObj.toEl,
+    fromEl = sortableStateObj.fromEl,
+    startIndex = sortableStateObj.startIndex,
+    newIndex = sortableStateObj.newIndex;
+
   sortable = (sortable || rootEl.sortableInstance)
 
   var evt = doc.createEvent('Event'),
