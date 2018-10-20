@@ -8,13 +8,15 @@ var SortableCurrentState = (function () {
     cloneEl,
     lastDownEl,
     scrollParentEl,
-    tapEvt,
-    touchEvt,
     moved,
     newIndex,
+    oldIndex,
+    activeGroup,
+
     lastEl,
     putSortable,
-    activeGroup,
+    tapEvt,
+    touchEvt,
     activeSortableItem;
 
   var
