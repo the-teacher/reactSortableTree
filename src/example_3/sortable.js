@@ -56,14 +56,12 @@ import {
   _index,
   _globalDragOver,
   _disableDraggable,
-  getFirstSortableParent
+  getFirstSortableParent,
+  disableDraggableForSpecificTags,
+  dragStartFn
 } from './helpers/utils'
 
-import {
-  _toggleClass,
-  _css,
-  _find
-} from './helpers/css'
+import { _toggleClass, _css, _find } from './helpers/css'
 
 import {
   _on,
@@ -72,33 +70,6 @@ import {
 } from './helpers/events'
 
 import SortableCurrentState from './sortableCurrentState'
-
-// Disable "draggable" functionality for specific tags
-// "a, img" by default
-function disableDraggableForSpecificTags (ignoreTags, sortableStateObj) {
-  ignoreTags.split(',').forEach(function (criteria) {
-    _find(sortableStateObj.draggableItem, criteria.trim(), _disableDraggable)
-  })
-}
-
-// This method is being called on Drag Start
-function dragStartFn (sortable, sortableStateObj, e, touch, options) {
-  // Delayed drag has been triggered
-  // we can re-enable the events: touchmove/mousemove
-  sortable._disableDelayedDrag()
-
-  // Make the element draggable
-  sortableStateObj.draggableItem.draggable = sortable.nativeDraggable;
-
-  // Chosen item
-  _toggleClass(sortableStateObj.draggableItem, options.chosenClass, true)
-
-  // Bind the events: dragstart/dragend
-  sortable._triggerDragStart(e, touch, sortableStateObj.rootEl, sortableStateObj.draggableItem)
-
-  // Drag start event
-  _dispatchEvent(sortable, 'choose', sortableStateObj)
-};
 
 const Sortable = (function () {
   'use strict';

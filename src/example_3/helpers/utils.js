@@ -1,5 +1,6 @@
 import { abs, min, win, newTag } from './base'
-import { _css } from './css'
+import { _toggleClass, _css, _find } from './css'
+import { _dispatchEvent } from './events'
 
 function _cloneHide(sortable, rootEl, cloneEl, dragEl, state) {
   if (sortable.lastPullMode !== 'clone') {
@@ -300,6 +301,33 @@ function getFirstSortableParent (el) {
   return el
 }
 
+// Disable "draggable" functionality for specific tags
+// "a, img" by default
+function disableDraggableForSpecificTags (ignoreTags, sortableStateObj) {
+  ignoreTags.split(',').forEach(function (criteria) {
+    _find(sortableStateObj.draggableItem, criteria.trim(), _disableDraggable)
+  })
+}
+
+// This method is being called on Drag Start
+function dragStartFn (sortable, sortableStateObj, e, touch, options) {
+  // Delayed drag has been triggered
+  // we can re-enable the events: touchmove/mousemove
+  sortable._disableDelayedDrag()
+
+  // Make the element draggable
+  sortableStateObj.draggableItem.draggable = sortable.nativeDraggable;
+
+  // Chosen item
+  _toggleClass(sortableStateObj.draggableItem, options.chosenClass, true)
+
+  // Bind the events: dragstart/dragend
+  sortable._triggerDragStart(e, touch, sortableStateObj.rootEl, sortableStateObj.draggableItem)
+
+  // Drag start event
+  _dispatchEvent(sortable, 'choose', sortableStateObj)
+};
+
 export {
   _cloneHide,
   _closest,
@@ -316,5 +344,7 @@ export {
   _index,
   _globalDragOver,
   _disableDraggable,
-  getFirstSortableParent
+  getFirstSortableParent,
+  disableDraggableForSpecificTags,
+  dragStartFn
 }
