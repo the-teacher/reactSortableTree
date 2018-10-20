@@ -307,7 +307,7 @@ const Sortable = (function () {
         this._lastY = Sortable.touchEvt.clientY;
 
         if (!supportCssPointerEvents) {
-          _css(Sortable.ghostEl, 'display', 'none')
+          _css(SortableCurrentState.ghostEl, 'display', 'none')
         }
 
         var target = doc.elementFromPoint(Sortable.touchEvt.clientX, Sortable.touchEvt.clientY)
@@ -341,7 +341,7 @@ const Sortable = (function () {
         }
 
         if (!supportCssPointerEvents) {
-          _css(Sortable.ghostEl, 'display', '')
+          _css(SortableCurrentState.ghostEl, 'display', '')
         }
       }
     }
@@ -372,10 +372,10 @@ const Sortable = (function () {
         Sortable.moved = true;
         Sortable.touchEvt = touch;
 
-        _css(Sortable.ghostEl, 'webkitTransform', translate3d)
-        _css(Sortable.ghostEl, 'mozTransform', translate3d)
-        _css(Sortable.ghostEl, 'msTransform', translate3d)
-        _css(Sortable.ghostEl, 'transform', translate3d)
+        _css(SortableCurrentState.ghostEl, 'webkitTransform', translate3d)
+        _css(SortableCurrentState.ghostEl, 'mozTransform', translate3d)
+        _css(SortableCurrentState.ghostEl, 'msTransform', translate3d)
+        _css(SortableCurrentState.ghostEl, 'transform', translate3d)
 
         e.preventDefault()
       }
@@ -571,11 +571,11 @@ const Sortable = (function () {
           return;
         }
 
-        if ((el.children.length === 0) || (el.children[0] === Sortable.ghostEl) ||
+        if ((el.children.length === 0) || (el.children[0] === SortableCurrentState.ghostEl) ||
           (el === e.target) && (this._ghostIsLast(el, e))
         ) {
           //assign target only if condition is true
-          if (el.children.length !== 0 && el.children[0] !== Sortable.ghostEl && el === e.target) {
+          if (el.children.length !== 0 && el.children[0] !== SortableCurrentState.ghostEl && el === e.target) {
             target = el.lastElementChild;
           }
 
@@ -691,7 +691,7 @@ const Sortable = (function () {
           !options.dropBubble && e.stopPropagation()
         }
 
-        Sortable.ghostEl && Sortable.ghostEl.parentNode && Sortable.ghostEl.parentNode.removeChild(Sortable.ghostEl)
+        SortableCurrentState.ghostEl && SortableCurrentState.ghostEl.parentNode && SortableCurrentState.ghostEl.parentNode.removeChild(SortableCurrentState.ghostEl)
 
         if (SortableCurrentState.rootEl === SortableCurrentState.parentEl || Sortable.activeSortableItem.lastPullMode !== 'clone') {
           // Remove clone
@@ -761,7 +761,7 @@ const Sortable = (function () {
       SortableCurrentState.rootEl =
       SortableCurrentState.draggableItem =
       SortableCurrentState.parentEl =
-      Sortable.ghostEl =
+      SortableCurrentState.ghostEl =
       SortableCurrentState.nextEl =
       Sortable.cloneEl =
       SortableCurrentState.lastDownEl =
@@ -786,33 +786,33 @@ const Sortable = (function () {
     }
 
     this._appendGhost =  function () {
-      if (!Sortable.ghostEl) {
+      if (!SortableCurrentState.ghostEl) {
         var rect = SortableCurrentState.draggableItem.getBoundingClientRect(),
           css = _css(SortableCurrentState.draggableItem),
           options = this.options,
           ghostRect;
 
-        Sortable.ghostEl = SortableCurrentState.draggableItem.cloneNode(true)
+        SortableCurrentState.ghostEl = SortableCurrentState.draggableItem.cloneNode(true)
 
-        _toggleClass(Sortable.ghostEl, options.ghostClass, false)
-        _toggleClass(Sortable.ghostEl, options.fallbackClass, true)
-        _toggleClass(Sortable.ghostEl, options.dragClass, true)
+        _toggleClass(SortableCurrentState.ghostEl, options.ghostClass, false)
+        _toggleClass(SortableCurrentState.ghostEl, options.fallbackClass, true)
+        _toggleClass(SortableCurrentState.ghostEl, options.dragClass, true)
 
-        _css(Sortable.ghostEl, 'top', rect.top - toInt(css.marginTop))
-        _css(Sortable.ghostEl, 'left', rect.left - toInt(css.marginLeft))
-        _css(Sortable.ghostEl, 'width', rect.width)
-        _css(Sortable.ghostEl, 'height', rect.height)
-        _css(Sortable.ghostEl, 'opacity', '0.8')
-        _css(Sortable.ghostEl, 'position', 'fixed')
-        _css(Sortable.ghostEl, 'zIndex', '100000')
-        _css(Sortable.ghostEl, 'pointerEvents', 'none')
+        _css(SortableCurrentState.ghostEl, 'top', rect.top - toInt(css.marginTop))
+        _css(SortableCurrentState.ghostEl, 'left', rect.left - toInt(css.marginLeft))
+        _css(SortableCurrentState.ghostEl, 'width', rect.width)
+        _css(SortableCurrentState.ghostEl, 'height', rect.height)
+        _css(SortableCurrentState.ghostEl, 'opacity', '0.8')
+        _css(SortableCurrentState.ghostEl, 'position', 'fixed')
+        _css(SortableCurrentState.ghostEl, 'zIndex', '100000')
+        _css(SortableCurrentState.ghostEl, 'pointerEvents', 'none')
 
-        options.fallbackOnBody && doc.body.appendChild(Sortable.ghostEl) || SortableCurrentState.rootEl.appendChild(Sortable.ghostEl)
+        options.fallbackOnBody && doc.body.appendChild(SortableCurrentState.ghostEl) || SortableCurrentState.rootEl.appendChild(SortableCurrentState.ghostEl)
 
         // Fixing dimensions.
-        ghostRect = Sortable.ghostEl.getBoundingClientRect()
-        _css(Sortable.ghostEl, 'width', rect.width * 2 - ghostRect.width)
-        _css(Sortable.ghostEl, 'height', rect.height * 2 - ghostRect.height)
+        ghostRect = SortableCurrentState.ghostEl.getBoundingClientRect()
+        _css(SortableCurrentState.ghostEl, 'width', rect.width * 2 - ghostRect.width)
+        _css(SortableCurrentState.ghostEl, 'height', rect.height * 2 - ghostRect.height)
       }
     }
     this._ghostIsLast = function (el, e) {
