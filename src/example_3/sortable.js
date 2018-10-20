@@ -121,7 +121,7 @@ const Sortable = (function () {
         dragStartFn;
 
       if (target && !SortableCurrentState.draggableItem && (target.parentNode === el)) {
-        Sortable.tapEvt = e;
+        SortableCurrentState.tapEvt = e;
         SortableCurrentState.rootEl = el;
         SortableCurrentState.draggableItem = target;
         SortableCurrentState.parentEl = SortableCurrentState.draggableItem.parentNode;
@@ -346,13 +346,13 @@ const Sortable = (function () {
       }
     }
     this._onTouchMove = function (e) {
-      if (Sortable.tapEvt) {
+      if (SortableCurrentState.tapEvt) {
         var  options = this.options,
           fallbackTolerance = options.fallbackTolerance,
           fallbackOffset = options.fallbackOffset,
           touch = e.touches ? e.touches[0] : e,
-          dx = (touch.clientX - Sortable.tapEvt.clientX) + fallbackOffset.x,
-          dy = (touch.clientY - Sortable.tapEvt.clientY) + fallbackOffset.y,
+          dx = (touch.clientX - SortableCurrentState.tapEvt.clientX) + fallbackOffset.x,
+          dy = (touch.clientY - SortableCurrentState.tapEvt.clientY) + fallbackOffset.y,
           translate3d = e.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
         // only set the status to dragging, when we are actually dragging
@@ -386,16 +386,16 @@ const Sortable = (function () {
 
       if (touch) {
         // Touch device support
-        Sortable.tapEvt = {
+        SortableCurrentState.tapEvt = {
           target: dragEl,
           clientX: touch.clientX,
           clientY: touch.clientY
         };
 
-        this._onDragStart(Sortable.tapEvt, 'touch')
+        this._onDragStart(SortableCurrentState.tapEvt, 'touch')
       }
       else if (!this.nativeDraggable) {
-        this._onDragStart(Sortable.tapEvt, true)
+        this._onDragStart(SortableCurrentState.tapEvt, true)
       }
       else {
         _on(dragEl, 'dragend', this)
@@ -774,7 +774,7 @@ const Sortable = (function () {
       SortableCurrentState.putSortable =
       SortableCurrentState.activeSortableItem = null,
 
-      Sortable.tapEvt =
+      SortableCurrentState.tapEvt =
       Sortable.touchEvt = null;
 
       Sortable.savedInputChecked.forEach(function (el) {
