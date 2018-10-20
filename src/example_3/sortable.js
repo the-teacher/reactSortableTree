@@ -312,7 +312,7 @@ const Sortable = (function () {
 
         var target = doc.elementFromPoint(SortableCurrentState.touchEvt.clientX, SortableCurrentState.touchEvt.clientY)
         var parent = target;
-        var i = Sortable.touchDragOverListeners.length;
+        var i = SortableCurrentState.touchDragOverListeners.length;
 
         while (target && target.shadowRoot) {
           target = target.shadowRoot.elementFromPoint(SortableCurrentState.touchEvt.clientX, SortableCurrentState.touchEvt.clientY)
@@ -323,7 +323,7 @@ const Sortable = (function () {
           do {
             if (parent.sortableInstance) {
               while (i--) {
-                Sortable.touchDragOverListeners[i]({
+                SortableCurrentState.touchDragOverListeners[i]({
                   clientX: SortableCurrentState.touchEvt.clientX,
                   clientY: SortableCurrentState.touchEvt.clientY,
                   target: target,
@@ -900,7 +900,7 @@ const Sortable = (function () {
         el.removeAttribute('draggable')
       })
 
-      Sortable.touchDragOverListeners.splice(Sortable.touchDragOverListeners.indexOf(this._onDragOver), 1)
+      SortableCurrentState.touchDragOverListeners.splice(SortableCurrentState.touchDragOverListeners.indexOf(this._onDragOver), 1)
 
       this._onDrop()
 
@@ -1037,7 +1037,7 @@ const Sortable = (function () {
       _on(el, 'dragenter', this)
     }
 
-    Sortable.touchDragOverListeners.push(this._onDragOver)
+    SortableCurrentState.touchDragOverListeners.push(this._onDragOver)
 
     // Restore sorting
     options.store && this.sort(options.store.get(this))
@@ -1053,11 +1053,11 @@ const Sortable = (function () {
   return initialize;
 })()
 
-Sortable.version = '1.7.1'
+Sortable.version = '1.7.2'
 
 SortableCurrentState.silent = false
 SortableCurrentState.autoScroll = {}
 SortableCurrentState.savedInputChecked = []
-Sortable.touchDragOverListeners = []
+SortableCurrentState.touchDragOverListeners = []
 
 export default Sortable
