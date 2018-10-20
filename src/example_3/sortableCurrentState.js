@@ -1,4 +1,4 @@
-var SortableCurrentState = (function () {
+const SortableCurrentState = (function () {
   var
     rootEl,
     draggableItem,
@@ -15,7 +15,6 @@ var SortableCurrentState = (function () {
     lastEl,
     putSortable,
     activeSortableItem,
-
     tapEvt,
     touchEvt;
 
@@ -25,31 +24,31 @@ var SortableCurrentState = (function () {
     savedInputChecked = [],
     touchDragOverListeners = [];
 
-  const destroy = function () {
-    rootEl =
-    draggableItem =
-    parentEl =
-    ghostEl =
-    nextEl =
-    cloneEl =
-    lastDownEl =
-    scrollParentEl =
-    moved =
-    newIndex =
-    oldIndex =
-    activeGroup =
-    lastEl =
-    putSortable =
-    activeSortableItem = null;
+  const reset = function () {
+    this.rootEl =
+    this.draggableItem =
+    this.parentEl =
+    this.ghostEl =
+    this.nextEl =
+    this.cloneEl =
+    this.lastDownEl =
+    this.scrollParentEl =
+    this.moved =
+    this.newIndex =
+    this.oldIndex =
+    this.activeGroup =
+    this.lastEl =
+    this.putSortable =
+    this.activeSortableItem = null;
 
-    tapEvt =
-    touchEvt = null;
+    this.tapEvt =
+    this.touchEvt = null;
 
-    savedInputChecked.forEach(function (el) {
+    this.savedInputChecked.forEach(function (el) {
       el.checked = true;
     })
 
-    savedInputChecked.length = 0
+    this.savedInputChecked.length = 0
 
     return true
   }
@@ -79,7 +78,7 @@ var SortableCurrentState = (function () {
     tapEvt: tapEvt,
     touchEvt: touchEvt,
 
-    destroy: destroy
+    reset: reset
   }
 })()
 

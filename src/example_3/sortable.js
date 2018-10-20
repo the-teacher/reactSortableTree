@@ -758,29 +758,7 @@ const Sortable = (function () {
       this._nulling(e)
     }
     this._nulling = function(e) {
-      SortableCurrentState.rootEl =
-      SortableCurrentState.draggableItem =
-      SortableCurrentState.parentEl =
-      SortableCurrentState.ghostEl =
-      SortableCurrentState.nextEl =
-      SortableCurrentState.cloneEl =
-      SortableCurrentState.lastDownEl =
-      SortableCurrentState.scrollParentEl =
-      SortableCurrentState.moved =
-      SortableCurrentState.newIndex =
-      SortableCurrentState.oldIndex =
-      SortableCurrentState.activeGroup =
-      SortableCurrentState.lastEl =
-      SortableCurrentState.putSortable =
-      SortableCurrentState.activeSortableItem = null,
-
-      SortableCurrentState.tapEvt =
-      SortableCurrentState.touchEvt = null;
-
-      SortableCurrentState.savedInputChecked.forEach(function (el) {
-        el.checked = true;
-      })
-      SortableCurrentState.savedInputChecked.length = 0;
+      SortableCurrentState.reset()
     }
 
     this._appendGhost =  function () {
