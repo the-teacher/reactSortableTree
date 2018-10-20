@@ -112,8 +112,8 @@ const Sortable = (function () {
 
       // target => handler item or draggable element
 
-      var _this = this,
-        options = _this.options,
+      var
+        options = this.options,
         ownerDocument = el.ownerDocument;
 
       if (target && !SortableCurrentState.draggableItem && (target.parentNode === el)) {
@@ -126,25 +126,26 @@ const Sortable = (function () {
         // "a, img" by default
         disableDraggableForSpecificTags(options.ignore, SortableCurrentState)
 
-        _on(ownerDocument, 'mouseup', _this._onDrop)
-        _on(ownerDocument, 'touchend', _this._onDrop)
-        _on(ownerDocument, 'touchcancel', _this._onDrop)
-        _on(ownerDocument, 'selectstart', _this)
+        _on(ownerDocument, 'mouseup', this._onDrop)
+        _on(ownerDocument, 'touchend', this._onDrop)
+        _on(ownerDocument, 'touchcancel', this._onDrop)
+        _on(ownerDocument, 'selectstart', this)
 
-        options.supportPointer && _on(ownerDocument, 'pointercancel', _this._onDrop)
+        options.supportPointer && _on(ownerDocument, 'pointercancel', this._onDrop)
 
         if (options.delay) {
           // If the user moves the pointer or let go the click or touch
           // before the delay has been reached:
           // disable the delayed drag
-          _on(ownerDocument, 'mouseup', _this._disableDelayedDrag)
-          _on(ownerDocument, 'touchend', _this._disableDelayedDrag)
-          _on(ownerDocument, 'touchcancel', _this._disableDelayedDrag)
-          _on(ownerDocument, 'mousemove', _this._disableDelayedDrag)
-          _on(ownerDocument, 'touchmove', _this._delayedDragTouchMoveHandler)
-          options.supportPointer && _on(ownerDocument, 'pointermove', _this._delayedDragTouchMoveHandler)
+          _on(ownerDocument, 'mouseup', this._disableDelayedDrag)
+          _on(ownerDocument, 'touchend', this._disableDelayedDrag)
+          _on(ownerDocument, 'touchcancel', this._disableDelayedDrag)
+          _on(ownerDocument, 'mousemove', this._disableDelayedDrag)
+          _on(ownerDocument, 'touchmove', this._delayedDragTouchMoveHandler)
 
-          _this._dragStartTimer = setTimeout(function(){
+          options.supportPointer && _on(ownerDocument, 'pointermove', this._delayedDragTouchMoveHandler)
+
+          this._dragStartTimer = setTimeout(function(){
             dragStartFn(el.sortableInstance, SortableCurrentState, e, touch, options)
           }, options.delay)
         } else {
