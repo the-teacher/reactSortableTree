@@ -127,11 +127,10 @@ const Sortable = (function () {
         SortableCurrentState.lastDownEl = target;
         SortableCurrentState.activeGroup = options.group;
         SortableCurrentState.oldIndex = startIndex;
+        SortableCurrentState.draggableItem.style['will-change'] = 'all';
 
         this._lastX = (touch || e).clientX;
         this._lastY = (touch || e).clientY;
-
-        SortableCurrentState.draggableItem.style['will-change'] = 'all';
 
         dragStartFn = function () {
           // Delayed drag has been triggered
