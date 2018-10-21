@@ -58,9 +58,12 @@ import {
   _disableDraggable,
   getFirstSortableParent,
   disableDraggableForSpecificTags,
-  dragStartFn,
   setupSotrableStateObject
 } from './helpers/utils'
+
+import {
+  dragStartFn
+} from './helpers/handlers'
 
 import { _toggleClass, _css, _find } from './helpers/css'
 
@@ -122,8 +125,6 @@ const Sortable = (function () {
         this._lastX = (touch || e).clientX;
         this._lastY = (touch || e).clientY;
 
-        // Disable "draggable" functionality for specific tags
-        // "a, img" by default
         disableDraggableForSpecificTags(options.ignore, SortableCurrentState)
 
         _on(ownerDocument, 'mouseup', this._onDrop)
@@ -353,39 +354,6 @@ const Sortable = (function () {
       }
     }
 
-    this._triggerDragStart = function (e, touch, rootEl, dragEl) {
-      touch = touch || (e.pointerType == 'touch' ? e : null)
-
-      if (touch) {
-        // Touch device support
-        SortableCurrentState.tapEvt = {
-          target: dragEl,
-          clientX: touch.clientX,
-          clientY: touch.clientY
-        };
-
-        this._onDragStart(SortableCurrentState.tapEvt, 'touch')
-      }
-      else if (!this.nativeDraggable) {
-        this._onDragStart(SortableCurrentState.tapEvt, true)
-      }
-      else {
-        _on(dragEl, 'dragend', this)
-        _on(rootEl, 'dragstart', this._onDragStart)
-      }
-
-      try {
-        if (doc.selection) {
-          // Timeout neccessary for IE9
-          _nextTick(function () {
-            doc.selection.empty()
-          })
-        } else {
-          win.getSelection().removeAllRanges()
-        }
-      } catch (err) {
-      }
-    }
     this._onDragStart =  function (e, useFallback) {
       var el = getFirstSortableParent(e.target)
 

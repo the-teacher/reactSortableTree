@@ -309,25 +309,6 @@ function disableDraggableForSpecificTags (ignoreTags, sortableStateObj) {
   })
 }
 
-// This method is being called on Drag Start
-function dragStartFn (sortable, sortableStateObj, e, touch, options) {
-  // Delayed drag has been triggered
-  // we can re-enable the events: touchmove/mousemove
-  sortable._disableDelayedDrag()
-
-  // Make the element draggable
-  sortableStateObj.draggableItem.draggable = sortable.nativeDraggable;
-
-  // Chosen item
-  _toggleClass(sortableStateObj.draggableItem, options.chosenClass, true)
-
-  // Bind the events: dragstart/dragend
-  sortable._triggerDragStart(e, touch, sortableStateObj.rootEl, sortableStateObj.draggableItem)
-
-  // Drag start event
-  _dispatchEvent(sortable, 'choose', sortableStateObj)
-};
-
 function setupSotrableStateObject(sortableStateObj, e, el, target, group, startIndex) {
   sortableStateObj.tapEvt = e;
   sortableStateObj.rootEl = el;
@@ -358,6 +339,5 @@ export {
   _disableDraggable,
   getFirstSortableParent,
   disableDraggableForSpecificTags,
-  dragStartFn,
   setupSotrableStateObject
 }
