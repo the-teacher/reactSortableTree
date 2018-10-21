@@ -62,7 +62,8 @@ import {
 } from './helpers/utils'
 
 import {
-  dragStartFn
+  dragStartFn,
+  _onDragStart
 } from './helpers/handlers'
 
 import { _toggleClass, _css, _find } from './helpers/css'
@@ -354,68 +355,7 @@ const Sortable = (function () {
       }
     }
 
-    this._onDragStart =  function (e, useFallback) {
-      var el = getFirstSortableParent(e.target)
 
-      var _this = this
-      var dataTransfer = e.dataTransfer
-      var options = _this.options
-
-      _this._offUpEvents()
-
-      if (SortableCurrentState.activeGroup.checkPull(_this, _this, SortableCurrentState.draggableItem, e)) {
-        SortableCurrentState.cloneEl = clone(SortableCurrentState.draggableItem)
-
-        SortableCurrentState.cloneEl.draggable = false
-        SortableCurrentState.cloneEl.style['will-change'] = ''
-
-        _css(SortableCurrentState.cloneEl, 'display', 'none')
-        _toggleClass(SortableCurrentState.cloneEl, _this.options.chosenClass, false)
-
-        // #1143: IFrame support workaround
-        _this._cloneId = _nextTick(function () {
-          SortableCurrentState.rootEl.insertBefore(SortableCurrentState.cloneEl, SortableCurrentState.draggableItem)
-          _dispatchEvent(_this, 'clone', SortableCurrentState)
-        })
-      }
-
-      _toggleClass(SortableCurrentState.draggableItem, options.dragClass, true)
-
-      if (useFallback) {
-        if (useFallback === 'touch') {
-          // Bind touch events
-          _on(doc, 'touchmove', _this._onTouchMove)
-          _on(doc, 'touchend', _this._onDrop)
-          _on(doc, 'touchcancel', _this._onDrop)
-
-          if (options.supportPointer) {
-            _on(doc, 'pointermove', _this._onTouchMove)
-            _on(doc, 'pointerup', _this._onDrop)
-          }
-        } else {
-          // Old brwoser
-          _on(doc, 'mousemove', _this._onTouchMove)
-          _on(doc, 'mouseup', _this._onDrop)
-        }
-
-        _this._loopId = setInterval(_this._emulateDragOver, 50)
-      }
-      else {
-        if (dataTransfer) {
-          dataTransfer.effectAllowed = 'move';
-          options.setData && options.setData.call(_this, dataTransfer, SortableCurrentState.draggableItem)
-        }
-
-        _on(doc, 'drop', _this)
-
-        // #1143: Бывает элемент с IFrame внутри блокирует `drop`,
-        // поэтому если вызвался `mouseover`, значит надо отменять весь d'n'd.
-        // Breaking Chrome 62+
-        // _on(doc, 'mouseover', _this)
-
-        _this._dragStartId = _nextTick(function () { _this._dragStarted(e) })
-      }
-    }
     this._onMove = function (fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvt, willInsertAfter) {
       var el = getFirstSortableParent(originalEvt.target)
 
@@ -620,7 +560,7 @@ const Sortable = (function () {
 
       if (this.nativeDraggable) {
         _off(doc, 'drop', this)
-        _off(el, 'dragstart', this._onDragStart)
+        _off(el, 'dragstart', _onDragStart)
       }
 
       this._offUpEvents()

@@ -1,9 +1,10 @@
-import { win, doc } from './base'
+import { win, doc, clone } from './base'
 import { _toggleClass, _css, _find } from './css'
 import { _on, _dispatchEvent } from './events'
 
 import {
-  _nextTick
+  _nextTick,
+  getFirstSortableParent
 } from './utils'
 
 const resetSelection = function () {
@@ -43,7 +44,7 @@ const dragStartFn = function (sortable, sortableStateObj, e, touch, options) {
   _dispatchEvent(sortable, 'choose', sortableStateObj)
 }
 
-const _triggerDragStart = function (sortable, sortableStateObj, e, touch) {
+function _triggerDragStart (sortable, sortableStateObj, e, touch) {
   touch = touch || (e.pointerType == 'touch' ? e : null)
 
   const rootEl = sortableStateObj.rootEl
@@ -57,19 +58,82 @@ const _triggerDragStart = function (sortable, sortableStateObj, e, touch) {
       clientY: touch.clientY
     };
 
-    sortable._onDragStart(sortableStateObj.tapEvt, 'touch')
+    _onDragStart(sortableStateObj.tapEvt, 'touch', sortable, sortableStateObj)
   }
   else if (!sortable.nativeDraggable) {
-    sortable._onDragStart(sortableStateObj.tapEvt, true)
+    _onDragStart(sortableStateObj.tapEvt, true, sortable, sortableStateObj)
   }
   else {
     _on(dragEl, 'dragend', sortable)
-    _on(rootEl, 'dragstart', sortable._onDragStart)
+    _on(rootEl, 'dragstart', function(e) { _onDragStart(e, null, sortable, sortableStateObj) })
   }
 
   resetSelection()
 }
 
+function _onDragStart (e, useFallback, sortable, sortableStateObj) {
+  var el = getFirstSortableParent(e.target)
+
+  var dataTransfer = e.dataTransfer
+  var options = el.sortableInstance.options
+
+  sortable._offUpEvents()
+
+  if (sortableStateObj.activeGroup.checkPull(sortable, sortable, sortableStateObj.draggableItem, e)) {
+    sortableStateObj.cloneEl = clone(sortableStateObj.draggableItem)
+
+    sortableStateObj.cloneEl.draggable = false
+    sortableStateObj.cloneEl.style['will-change'] = ''
+
+    _css(sortableStateObj.cloneEl, 'display', 'none')
+    _toggleClass(sortableStateObj.cloneEl, sortable.options.chosenClass, false)
+
+    // #1143: IFrame support workaround
+    sortable._cloneId = _nextTick(function () {
+      sortableStateObj.rootEl.insertBefore(sortableStateObj.cloneEl, sortableStateObj.draggableItem)
+      _dispatchEvent(sortable, 'clone', sortableStateObj)
+    })
+  }
+
+  _toggleClass(sortableStateObj.draggableItem, options.dragClass, true)
+
+  if (useFallback) {
+    if (useFallback === 'touch') {
+      // Bind touch events
+      _on(doc, 'touchmove', sortable._onTouchMove)
+      _on(doc, 'touchend', sortable._onDrop)
+      _on(doc, 'touchcancel', sortable._onDrop)
+
+      if (options.supportPointer) {
+        _on(doc, 'pointermove', sortable._onTouchMove)
+        _on(doc, 'pointerup', sortable._onDrop)
+      }
+    } else {
+      // Old brwoser
+      _on(doc, 'mousemove', sortable._onTouchMove)
+      _on(doc, 'mouseup', sortable._onDrop)
+    }
+
+    sortable._loopId = setInterval(sortable._emulateDragOver, 50)
+  }
+  else {
+    if (dataTransfer) {
+      dataTransfer.effectAllowed = 'move';
+      options.setData && options.setData.call(sortable, dataTransfer, sortableStateObj.draggableItem)
+    }
+
+    _on(doc, 'drop', sortable)
+
+    // #1143: Бывает элемент с IFrame внутри блокирует `drop`,
+    // поэтому если вызвался `mouseover`, значит надо отменять весь d'n'd.
+    // Breaking Chrome 62+
+    // _on(doc, 'mouseover', sortable)
+
+    sortable._dragStartId = _nextTick(function () { sortable._dragStarted(e) })
+  }
+}
+
 export {
-  dragStartFn
+  dragStartFn,
+  _onDragStart
 }
