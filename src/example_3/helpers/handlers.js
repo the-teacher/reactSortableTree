@@ -69,7 +69,7 @@ function _triggerDragStart (sortable, sortableStateObj, e, touch) {
     sortableStateObj.dragStartHandler = function(e) { _onDragStart(e, null, sortable, sortableStateObj) }
 
     _on(dragEl, 'dragend', sortable)
-    _on(rootEl, 'dragstart', sortableStateObj.dragStartHadler)
+    _on(rootEl, 'dragstart', sortableStateObj.dragStartHandler)
   }
 
   resetSelection()
