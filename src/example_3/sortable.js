@@ -560,7 +560,7 @@ const Sortable = (function () {
 
       if (this.nativeDraggable) {
         _off(doc, 'drop', this)
-        _off(el, 'dragstart', _onDragStart)
+        _off(el, 'dragstart', SortableCurrentState.dragStartHandler)
       }
 
       this._offUpEvents()

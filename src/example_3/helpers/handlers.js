@@ -64,8 +64,12 @@ function _triggerDragStart (sortable, sortableStateObj, e, touch) {
     _onDragStart(sortableStateObj.tapEvt, true, sortable, sortableStateObj)
   }
   else {
+    // save in a "global" variable
+    // to remove the event handler later
+    sortableStateObj.dragStartHandler = function(e) { _onDragStart(e, null, sortable, sortableStateObj) }
+
     _on(dragEl, 'dragend', sortable)
-    _on(rootEl, 'dragstart', function(e) { _onDragStart(e, null, sortable, sortableStateObj) })
+    _on(rootEl, 'dragstart', sortableStateObj.dragStartHadler)
   }
 
   resetSelection()
