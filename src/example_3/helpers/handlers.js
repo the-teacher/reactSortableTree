@@ -6,6 +6,19 @@ import {
   _nextTick
 } from './utils'
 
+const resetSelection = function () {
+  try {
+    if (doc.selection) {
+      // Timeout neccessary for IE9
+      _nextTick(function () {
+        doc.selection.empty()
+      })
+    } else {
+      win.getSelection().removeAllRanges()
+    }
+  } catch (err) {}
+}
+
 // An order how handlers are being called
 // 1. _prepareDragStart
 // 2. dragStartFn
@@ -54,17 +67,7 @@ const _triggerDragStart = function (sortable, sortableStateObj, e, touch) {
     _on(rootEl, 'dragstart', sortable._onDragStart)
   }
 
-  try {
-    if (doc.selection) {
-      // Timeout neccessary for IE9
-      _nextTick(function () {
-        doc.selection.empty()
-      })
-    } else {
-      win.getSelection().removeAllRanges()
-    }
-  } catch (err) {
-  }
+  resetSelection()
 }
 
 export {
