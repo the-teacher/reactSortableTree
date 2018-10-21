@@ -720,9 +720,6 @@ const Sortable = (function () {
       _off(ownerDocument, 'selectstart', this)
     }
 
-    this.closest = function (el, selector) {
-      return _closest(el, selector || this.options.draggable, this.el)
-    }
     this.option = function (name, value) {
       var options = this.options;
 
