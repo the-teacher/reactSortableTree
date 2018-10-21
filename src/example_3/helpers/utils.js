@@ -188,31 +188,31 @@ const _autoScroll = _throttle(function (e, options, rootEl, sortableObj, autoScr
   }
 }, 30)
 
-const _prepareGroup = function (options) {
-  function toFn(value, pull) {
-    if (value == null || value === true) {
-      value = group.name;
-      if (value == null) {
-        return (function () { return false })
-      }
-    }
-
-    if (typeof value === 'function') {
-      return value;
-    } else {
-      return function (to, from) {
-        var fromGroup = from.options.group.name;
-
-        return pull
-          ? value
-          : value && (value.join
-            ? value.indexOf(fromGroup) > -1
-            : (fromGroup == value)
-          )
-      };
+function toFn(value, group, pull) {
+  if (value == null || value === true) {
+    value = group.name;
+    if (value == null) {
+      return (function () { return false })
     }
   }
 
+  if (typeof value === 'function') {
+    return value;
+  } else {
+    return function (to, from) {
+      var fromGroup = from.options.group.name;
+
+      return pull
+        ? value
+        : value && (value.join
+          ? value.indexOf(fromGroup) > -1
+          : (fromGroup == value)
+        )
+    };
+  }
+}
+
+const _prepareGroup = function (options) {
   var group = {};
   var originalGroup = options.group;
 
@@ -221,8 +221,8 @@ const _prepareGroup = function (options) {
   }
 
   group.name = originalGroup.name;
-  group.checkPull = toFn(originalGroup.pull, true)
-  group.checkPut = toFn(originalGroup.put)
+  group.checkPull = toFn(originalGroup.pull, group, true)
+  group.checkPut = toFn(originalGroup.put, group)
   group.revertClone = originalGroup.revertClone;
 
   options.group = group;
