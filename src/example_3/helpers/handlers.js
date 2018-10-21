@@ -83,7 +83,9 @@ function _onDragStart (e, useFallback, sortable, sortableStateObj) {
 
   sortable._offUpEvents()
 
-  if (sortableStateObj.activeGroup.checkPull(sortable, sortable, sortableStateObj.draggableItem, e)) {
+  var supportsGroupExchange = sortableStateObj.activeGroup.checkPull(sortable, sortable, sortableStateObj.draggableItem, e)
+
+  if (supportsGroupExchange) {
     sortableStateObj.cloneEl = clone(sortableStateObj.draggableItem)
 
     sortableStateObj.cloneEl.draggable = false
