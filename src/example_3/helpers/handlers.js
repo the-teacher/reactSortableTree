@@ -89,6 +89,7 @@ function _onDragStart (e, useFallback, sortable, sortableStateObj) {
     _toggleClass(sortableStateObj.cloneEl, sortable.options.chosenClass, false)
 
     // #1143: IFrame support workaround
+    // https://github.com/RubaXa/Sortable/pull/1143
     sortable._cloneId = _nextTick(function () {
       sortableStateObj.rootEl.insertBefore(sortableStateObj.cloneEl, sortableStateObj.draggableItem)
       _dispatchEvent(sortable, 'clone', sortableStateObj)
@@ -124,6 +125,7 @@ function _onDragStart (e, useFallback, sortable, sortableStateObj) {
 
     _on(doc, 'drop', sortable)
 
+    // https://github.com/RubaXa/Sortable/pull/1143
     // #1143: Бывает элемент с IFrame внутри блокирует `drop`,
     // поэтому если вызвался `mouseover`, значит надо отменять весь d'n'd.
     // Breaking Chrome 62+
