@@ -2,6 +2,10 @@ import { win, doc } from './base'
 import { _toggleClass, _css, _find } from './css'
 import { _on, _dispatchEvent } from './events'
 
+import {
+  _nextTick
+} from './utils'
+
 // An order how handlers are being called
 // 1. _prepareDragStart
 // 2. dragStartFn
